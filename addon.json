@@ -1,0 +1,11 @@
+{
+	"title"		: "Star Wars Vehicles: Episode 1",
+	"type"		: "vehicle",
+	"tags"		: [ "roleplay", "movie" ],
+	"ignore"	: [
+		"*.psd",
+		"*.vcproj",
+		"*.svn*",
+		"*.DS_Store"
+	]
+}
