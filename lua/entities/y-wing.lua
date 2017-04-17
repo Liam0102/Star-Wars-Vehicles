@@ -6,9 +6,9 @@ ENT.Base = "fighter_base"
 
 ENT.PrintName = "Y-Wing"
 ENT.Author = "Liam0102"
-ENT.Category = "Star Wars"
+ENT.Category = "Star Wars Vehicles: Rebels"
 ENT.AutomaticFrameAdvance = true
-ENT.Spawnable = true;
+ENT.Spawnable = false;
 ENT.AdminSpawnable = false;
 
 ENT.EntModel = "models/ywing/ywing.mdl"
@@ -16,7 +16,7 @@ ENT.FlyModel = "models/ywing/ywing1.mdl"
 ENT.Vehicle = "YWing"
 ENT.StartHealth = 1500;
 ENT.Allegiance = "Rebels";
-
+list.Set("SWVehicles", ENT.PrintName, ENT);
 util.PrecacheModel("models/ywing/ywing1.mdl")
 
 if SERVER then

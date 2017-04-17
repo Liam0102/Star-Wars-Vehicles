@@ -3,15 +3,15 @@ ENT.Base = "speeder_base"
 ENT.Type = "vehicle"
 
 ENT.PrintName = "Speeder Bike"
-ENT.Author = "Liam0102, Yourname"
-ENT.Category = "Star Wars"
+ENT.Author = "Liam0102"
+ENT.Category = "Star Wars Vehicles: Empire"
 ENT.AutomaticFrameAdvance = true
-ENT.Spawnable = true;
+ENT.Spawnable = false;
 ENT.AdminSpawnable = false;
 
 ENT.Vehicle = "SpeederBike"; // The unique name for the speeder.
 ENT.EntModel = "models/SGG/Starwars/speeder_bike.mdl"; // The path to your model
-
+list.Set("SWVehicles", ENT.PrintName, ENT);
 
 ENT.StartHealth = 1000;
 if SERVER then

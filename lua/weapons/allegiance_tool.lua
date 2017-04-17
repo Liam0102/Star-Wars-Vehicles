@@ -13,9 +13,9 @@ SWEP.ViewModel = "models/weapons/c_toolgun.mdl"
 SWEP.WorldModel = "models/weapons/w_toolgun.mdl"
 SWEP.AnimPrefix = "python"
 SWEP.HoldType = "pistol"
-SWEP.Spawnable = true
+SWEP.Spawnable = false
 SWEP.AdminSpawnable = false
-
+list.Set("SWVehicles.Weapons", SWEP.PrintName, SWEP);
 
 SWEP.Primary.ClipSize = -1
 SWEP.Primary.DefaultClip = -1

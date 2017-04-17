@@ -5,15 +5,15 @@ ENT.Type = "vehicle"
 
 ENT.PrintName = "AAT"
 ENT.Author = "Liam0102"
-ENT.Category = "Star Wars"
+ENT.Category = "Star Wars Vehicles: CIS"
 ENT.AutomaticFrameAdvance = true
-ENT.Spawnable = true;
+ENT.Spawnable = false;
 ENT.AdminSpawnable = false;
 
 ENT.Vehicle = "AAT";
 ENT.EntModel = "models/aat/aat_hull1.mdl";
 ENT.StartHealth = 4000;
-
+list.Set("SWVehicles", ENT.PrintName, ENT);
 if SERVER then
 
 ENT.NextUse = {Use = CurTime(),Fire = CurTime()};

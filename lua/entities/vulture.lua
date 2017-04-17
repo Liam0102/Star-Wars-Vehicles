@@ -6,16 +6,16 @@ ENT.Type = "vehicle"
 
 ENT.PrintName = "Vulture"
 ENT.Author = "Liam0102"
-ENT.Category = "Star Wars"
+ENT.Category = "Star Wars Vehicles: CIS"
 ENT.AutomaticFrameAdvance = true
-ENT.Spawnable = true;
+ENT.Spawnable = false;
 ENT.AdminSpawnable = false;
 
 ENT.EntModel = "models/vulture/vulture1.mdl"
 ENT.Vehicle = "Vulture"
 ENT.StartHealth = 500;
 ENT.Allegiance = "CIS";
-
+list.Set("SWVehicles", ENT.PrintName, ENT);
 if SERVER then
 
 ENT.FireSound = Sound("weapons/tie_shoot.wav");

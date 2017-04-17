@@ -5,14 +5,15 @@ ENT.Type = "vehicle"
 
 ENT.PrintName = "TX-130"
 ENT.Author = "Liam0102"
-ENT.Category = "Star Wars"
+ENT.Category = "Star Wars Vehicles: Republic"
 ENT.AutomaticFrameAdvance = true
-ENT.Spawnable = true;
+ENT.Spawnable = false;
 ENT.AdminSpawnable = false;
 
 ENT.Vehicle = "TX130";
 ENT.EntModel = "models/tx130t/tx130t_hull1.mdl";
 ENT.StartHealth = 2500;
+list.Set("SWVehicles", ENT.PrintName, ENT);
 
 if SERVER then
 

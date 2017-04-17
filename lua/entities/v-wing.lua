@@ -4,16 +4,16 @@ ENT.Type = "vehicle"
 
 ENT.PrintName = "V-Wing"
 ENT.Author = "Liam0102"
-ENT.Category = "Star Wars"
+ENT.Category = "Star Wars Vehicles: Republic"
 ENT.AutomaticFrameAdvance = true
-ENT.Spawnable = true;
+ENT.Spawnable = false;
 ENT.AdminSpawnable = false;
 
 ENT.EntModel = "models/vwing/vwing1.mdl"
 ENT.Vehicle = "VWing"
 ENT.StartHealth = 1500;
 ENT.Allegiance = "Rebels";
-
+list.Set("SWVehicles", ENT.PrintName, ENT);
 if SERVER then
 
 ENT.FireSound = Sound("weapons/xwing_shoot.wav");

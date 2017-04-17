@@ -5,16 +5,16 @@ ENT.Type = "vehicle"
 
 ENT.PrintName = "TIE Advanced"
 ENT.Author = "Liam0102"
-ENT.Category = "Star Wars"
+ENT.Category = "Star Wars Vehicles: Empire"
 ENT.AutomaticFrameAdvance = true
-ENT.Spawnable = true;
+ENT.Spawnable = false;
 ENT.AdminSpawnable = false;
 
 ENT.EntModel = "models/tiead/tiead1.mdl"
 ENT.Vehicle = "TieAdvanced"
 ENT.StartHealth = 3000;
 ENT.Allegiance = "Empire";
-
+list.Set("SWVehicles", ENT.PrintName, ENT);
 if SERVER then
 
 ENT.FireSound = Sound("weapons/tie_shoot.wav");

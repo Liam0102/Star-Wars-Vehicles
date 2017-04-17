@@ -4,9 +4,9 @@ ENT.Base = "fighter_base"
 
 ENT.PrintName = "Slave One"
 ENT.Author = "Liam0102"
-ENT.Category = "Star Wars"
+ENT.Category = "Star Wars Vehicles: Empire"
 ENT.AutomaticFrameAdvance = true
-ENT.Spawnable = true;
+ENT.Spawnable = false;
 ENT.AdminSpawnable = true;
 ENT.AdminOnly = true;
 
@@ -14,7 +14,7 @@ ENT.EntModel = "models/firespray/firespray1.mdl"
 ENT.Vehicle = "Slave"
 ENT.StartHealth = 7000;
 ENT.Allegiance = "Empire";
-
+list.Set("SWVehicles", ENT.PrintName, ENT);
 if SERVER then
 
 ENT.FireSound = Sound("weapons/slave_shoot.wav");

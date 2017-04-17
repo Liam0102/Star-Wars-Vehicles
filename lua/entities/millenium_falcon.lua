@@ -4,9 +4,9 @@ ENT.Base = "fighter_base"
 
 ENT.PrintName = "Millennium Falcon"
 ENT.Author = "Liam0102"
-ENT.Category = "Star Wars"
+ENT.Category = "Star Wars Vehicles: Rebels"
 ENT.AutomaticFrameAdvance = true
-ENT.Spawnable = true;
+ENT.Spawnable = false;
 ENT.AdminSpawnable = true;
 ENT.AdminOnly = true;
 
@@ -15,7 +15,7 @@ ENT.FlyModel = "models/mf/mf1.mdl"
 ENT.Vehicle = "Falcon"
 ENT.StartHealth = 6000;
 ENT.Allegiance = "Rebels";
-
+list.Set("SWVehicles", ENT.PrintName, ENT);
 util.PrecacheModel("models/mf/mf1.mdl")
 
 

@@ -4,13 +4,14 @@ ENT.Type = "vehicle"
 
 ENT.PrintName = "BARC Speeder"
 ENT.Author = "Liam0102"
-ENT.Category = "Star Wars"
+ENT.Category = "Star Wars Vehicles: Republic"
 ENT.AutomaticFrameAdvance = true
-ENT.Spawnable = true;
+ENT.Spawnable = false;
 ENT.AdminSpawnable = false;
 
 ENT.Vehicle = "BARC";
 ENT.EntModel = "models/barc/barc1.mdl";
+list.Set("SWVehicles", ENT.PrintName, ENT);
 
 local classes = {
 	"speeder_bike",

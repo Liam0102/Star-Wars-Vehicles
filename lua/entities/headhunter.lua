@@ -4,16 +4,16 @@ ENT.Type = "vehicle"
 
 ENT.PrintName = "Z-95 Headhunter"
 ENT.Author = "Liam0102"
-ENT.Category = "Star Wars"
+ENT.Category = "Star Wars Vehicles: Republic"
 ENT.AutomaticFrameAdvance = true
-ENT.Spawnable = true;
+ENT.Spawnable = false;
 ENT.AdminSpawnable = false;
 
 ENT.EntModel = "models/z95/z951.mdl"
 ENT.Vehicle = "Headhunter"
 ENT.StartHealth = 1500;
 ENT.Allegiance = "Rebels";
-
+list.Set("SWVehicles", ENT.PrintName, ENT);
 if SERVER then
 
 ENT.FireSound = Sound("weapons/xwing_shoot.wav");

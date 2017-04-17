@@ -4,16 +4,16 @@ ENT.Type = "vehicle"
 
 ENT.PrintName = "Droid Tri-Fighter"
 ENT.Author = "Liam0102"
-ENT.Category = "Star Wars"
+ENT.Category = "Star Wars Vehicles: CIS"
 ENT.AutomaticFrameAdvance = true
-ENT.Spawnable = true;
+ENT.Spawnable = false;
 ENT.AdminSpawnable = false;
 
 ENT.EntModel = "models/tri/tri1.mdl"
 ENT.Vehicle = "DroidTri"
 ENT.Allegiance = "CIS";
 ENT.StartHealth = 750;
-
+list.Set("SWVehicles", ENT.PrintName, ENT);
 if SERVER then
 
 ENT.FireSound = Sound("weapons/tie_shoot.wav");

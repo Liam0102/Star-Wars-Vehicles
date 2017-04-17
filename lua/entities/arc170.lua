@@ -4,15 +4,16 @@ ENT.Base = "fighter_base"
 
 ENT.PrintName = "ARC-170"
 ENT.Author = "Liam0102"
-ENT.Category = "Star Wars"
+ENT.Category = "Star Wars Vehicles: Republic"
 ENT.AutomaticFrameAdvance = true // For smooth animations
-ENT.Spawnable = true; // Spawnable
+ENT.Spawnable = false; // Spawnable
 ENT.AdminSpawnable = false; // Is it only Admin spawnable?
 
 ENT.EntModel = "models/arc170/arc1701.mdl" // The model for the vehicle you're using
 ENT.Vehicle = "ARC170" // The name of the vehicle, this is very important.
 ENT.StartHealth = 2000; // How much health the vehicle will have
 ENT.Allegiance = "Republic";
+list.Set("SWVehicles", ENT.PrintName, ENT);
 
 if SERVER then
 

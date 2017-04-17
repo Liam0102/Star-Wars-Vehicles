@@ -4,16 +4,16 @@ ENT.Type = "vehicle"
 
 ENT.PrintName = "Eta-2"
 ENT.Author = "Liam0102"
-ENT.Category = "Star Wars"
+ENT.Category = "Star Wars Vehicles: Republic"
 ENT.AutomaticFrameAdvance = true
-ENT.Spawnable = true;
+ENT.Spawnable = false;
 ENT.AdminSpawnable = false;
 
 ENT.EntModel = "models/eta2r/eta2r1.mdl"
 ENT.Vehicle = "EtaR"
 ENT.StartHealth = 1000;
 ENT.Allegiance = "Republic";
-
+list.Set("SWVehicles", ENT.PrintName, ENT);
 if SERVER then
 
 ENT.FireSound = Sound("weapons/xwing_shoot.wav");

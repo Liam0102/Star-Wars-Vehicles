@@ -4,15 +4,15 @@ ENT.Type = "vehicle"
 
 ENT.PrintName = "Podracer"
 ENT.Author = "Liam0102"
-ENT.Category = "Star Wars"
+ENT.Category = "Star Wars Vehicles: Other"
 ENT.AutomaticFrameAdvance = true
-ENT.Spawnable = true;
+ENT.Spawnable = false;
 ENT.AdminSpawnable = false;
 
 ENT.Vehicle = "Podracer";
 ENT.EntModel = "models/sebracer/sebracer.mdl";
 ENT.StartHealth = 1000;
-
+list.Set("SWVehicles", ENT.PrintName, ENT);
 if SERVER then
 
 ENT.NextUse = {Use = CurTime(),Fire = CurTime()};
