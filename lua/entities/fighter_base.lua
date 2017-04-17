@@ -3,59 +3,7 @@ ENT.Base = "base_anim"
 ENT.Type = "vehicle"
 ENT.AutomaticFrameAdvance = true;
 
-local ships = {
-	"aat",
-	"arc170",
-	"a-wing",
-	"delta",
-	"droid_gun",
-	"droid_tri",
-	"eta2",
-	"eta2y",
-	"fo_tie_fighter",
-	"geonosis",
-	"imp_speeder",
-	"laat",
-	"landspeeder",
-	"millenium_falcon",
-	"n-1",
-	"podracer",
-	"republic_speeder",
-	"slave",
-	"snowspeeder",
-	"speeder_bike",
-	"stap",
-	"tie_advanced",
-	"tie_bomber",
-	"tie_fighter",
-	"tie_interceptor",
-	"vulture",
-	"x-wing",
-	"y-wing",
-	"supremancystar_fighter",
-	"soulless",
-	"v-wing",
-	"lambda",
-	"headhunter",
-	"storm",
-	"blockade",
-	"tx130",
-	"sentinel",
-	"x-wing_tfa",
-	"delta7",
-	"xj6",
-}
-
 ENT.IsSWVehicle = true;
-function ENT:IsStarWarsShip(class)
-
-	for k,v in pairs(ships) do
-		if(class == v) then
-			return true;
-		end
-	end
-	return false;
-end
 
 if SERVER then
 
@@ -261,7 +209,7 @@ function CreateBulletStructure(dmg,color,nosplashdamage)
 
 	local bullet = {
 		Spread		= Vector(0.001,0.001,0),
-		Damage		= dmg,
+		Damage		= dmg*1.25,
 		Force		= dmg,
 		TracerName	= color .. "_tracer_fx",
 		Callback = function(p,tr,damage)
@@ -305,10 +253,8 @@ function CreateBulletStructure(dmg,color,nosplashdamage)
 				end
 			end
 		end	
-	}
-	
+	}	
 	return bullet;
-
 end
 
 
@@ -538,8 +484,7 @@ function ENT:FireWeapons()
 	
 	if(self.NextUse.Fire < CurTime()) then
 		for k,v in pairs(self.Weapons) do
-			//local angPos = self.WeaponDir or self:GetAngles():Forward();
-			
+	
 			local tr = util.TraceLine({
 				start = self:GetPos(),
 				endpos = self:GetPos()+self:GetForward()*10000,
@@ -585,7 +530,7 @@ function ENT:FireWeapons()
 			al = 1;
 		end
 		self:EmitSound(self.FireSound,100,math.random(90,110));
-		self.NextUse.Fire = CurTime() + (self.FireDelay or 0.2);
+		self.NextUse.Fire = CurTime() + (self.FireDelay or 0.2)*0.8;
 	end
 end
 
@@ -594,7 +539,7 @@ function ENT:FindTarget()
 	corner1 = self:LocalToWorld(corner1);
 	corner2 = self:LocalToWorld(corner2) + self:GetForward()*10000;
 	for k,v in pairs(ents.FindInBox(corner1,corner2)) do
-		if(((self:IsStarWarsShip(v:GetClass()) or v.IsSWVehicle) and !v.DontLock) and v != self) then
+		if(v.IsSWVehicle and !v.DontLock and v != self and v.Allegiance != self.Allegiance) then
 			return v;
 		end
 	end
@@ -603,6 +548,7 @@ function ENT:FindTarget()
 end
 
 function ENT:ChangeAllegiance(al)
+    self.Allegiance = al;
 	self:SetNWString("Allegiance",al);
 end
 
@@ -1821,7 +1767,7 @@ if CLIENT then
 		if(!ShouldLock) then return false end;
 		local bounds1,bounds2 = self:GetModelBounds();
 		for l,w in pairs(ents.FindInBox(self:LocalToWorld(bounds1),self:LocalToWorld(bounds2)+self:GetForward()*10000)) do
-			if(((self:IsStarWarsShip(w:GetClass()) or w.IsSWVehicle) and !w.DontLock) and w != self) then
+			if(w.IsSWVehicle and !w.DontLock and w != self and w:GetNWString("Allegiance") != self.Allegiance) then
 				tr = util.TraceLine({
 					start = self:GetPos(),
 					endpos = w:GetPos(),
