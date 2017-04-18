@@ -127,7 +127,7 @@ end
 
 SWEP.Allegiance = "Rebels";
 function SWEP:SecondaryAttack()
-	if(self.Allegiance == "Empire") then
+	if(self.Allegiance == "Mandalorian") then
 		self.Allegiance = "CIS";
 	elseif(self.Allegiance == "CIS") then
 		self.Allegiance = "Republic";
@@ -137,6 +137,14 @@ function SWEP:SecondaryAttack()
 		self.Allegiance = "Neutral";
 	elseif(self.Allegiance == "Neutral") then
 		self.Allegiance = "Empire";
+	elseif(self.Allegiance == "Empire") then
+		self.Allegiance = "First Order";
+	elseif(self.Allegiance == "First Order") then
+		self.Allegiance = "Resistance";
+	elseif(self.Allegiance == "Resistance") then
+		self.Allegiance = "Corruption";
+	elseif(self.Allegiance == "Corruption") then
+		self.Allegiance = "Mandalorian";
 	end
 	self:SetNWString("Allegiance",self.Allegiance)
 	self:SetNextSecondaryFire(CurTime()+0.3);
