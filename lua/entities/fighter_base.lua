@@ -2052,7 +2052,7 @@ if CLIENT then
 	
 	function SW_LightOrDark(allegiance)
 	
-		if(allegiance == "CIS" or allegiance == "Empire") then
+		if(allegiance == "CIS" or allegiance == "Empire" or allegiance == "First Order" or allegiance == "Mandalorian") then
 			return "Dark";
 		elseif(allegiance == "Republic" or allegiance == "Rebels") then
 			return "Light";
