@@ -105,13 +105,12 @@ if CLIENT then
 	end
 
 	local View = {}
-	function CalcView()
+	function SpeederBikeCalcView()
 		
 		local p = LocalPlayer();
 		local self = p:GetNWEntity("SpeederBike", NULL)
 		local DriverSeat = p:GetNWEntity("DriverSeat",NULL);
 		local PassengerSeat = p:GetNWEntity("PassengerSeat",NULL);
-
 		if(IsValid(self)) then
 
 			if(IsValid(DriverSeat)) then
@@ -127,7 +126,7 @@ if CLIENT then
 
 		end
 	end
-	hook.Add("CalcView", "SpeederBikeView", CalcView)
+	hook.Add("CalcView", "SpeederBikeView", SpeederBikeCalcView)
 
 	
 	hook.Add( "ShouldDrawLocalPlayer", "SpeederBikeDrawPlayerModel", function( p )
