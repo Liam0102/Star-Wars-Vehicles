@@ -100,50 +100,14 @@ if CLIENT then
 	end
 
 end
-local Vehicles = {
-	"aat",
-	"arc170",
-	"a-wing",
-	"delta",
-	"droid_gun",
-	"droid_tri",
-	"eta2",
-	"eta2y",
-	"fo_tie_fighter",
-	"geonosis",
-	"imp_speeder",
-	"laat",
-	"landspeeder",
-	"millenium_falcon",
-	"n-1",
-	"podracer",
-	"rep_tank",
-	"republic_speeder",
-	"slave",
-	"snowspeeder",
-	"speeder_bike",
-	"stap",
-	"tie_advanced",
-	"tie_bomber",
-	"tie_fighter",
-	"tie_interceptor",
-	"vulture",
-	"x-wing",
-	"y-wing",
-	"supremancystar_fighter",
-	"soulless",
-	"v-wing",
-	"lambda",
-	"headhunter",
-	"storm",
-	"tx130",
-}
-function GetStarWarsVehicle(veh)
 
+function GetStarWarsVehicle(veh)
+    
+    local Vehicles = list.Get("SWVehicles");
 	for k,v in pairs(Vehicles) do
-		if(veh == v) then
-			return true;
-		end
+		if(v.ClassName == veh) then
+            return true;
+        end
 	end
 	return false;
 

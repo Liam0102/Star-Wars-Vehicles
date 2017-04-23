@@ -229,6 +229,8 @@ function ENT:OnRemove()
 	end
 end
 
+ENT.DriverFPV = false;
+ENT.PassengerFPV = false;
 function ENT:Enter(p,driver)
 	self:SetNWInt("MaxSpeed",self.BoostSpeed);
 	p:SetNWInt("SW_Speeder_MaxSpeed",self.BoostSpeed)
@@ -239,6 +241,7 @@ function ENT:Enter(p,driver)
 		
 		if(driver) then
 			p:EnterVehicle(self.DriverChair);
+            self.DriverChair:SetThirdPersonMode(self.DriverFPV);
 			self:SetNWBool("Flying" .. self.Vehicle,true);	
 			self.Pilot = p;
 			p:SetNWEntity("DriverSeat",self.DriverChair);
@@ -250,6 +253,7 @@ function ENT:Enter(p,driver)
 		else
             if(IsValid(self.PassengerChair)) then
                 p:EnterVehicle(self.PassengerChair);
+                self.DriverChair:SetThirdPersonMode(self.PassengerFPV);
                 self.Passenger = p;
                 p:SetNWEntity("PassengerSeat",self.PassengerChair);
             end
@@ -271,9 +275,9 @@ function ENT:Exit(driver,kill)
 				self.Pilot:SetPos((self:GetPos()+self:GetUp()*20+self:GetForward()*5+self:GetRight()*-85) or self.ExitPos);
 			end
 			if (kill) then self.Pilot:Kill(); end
-			if(driver) then
-				self.Pilot:ExitVehicle(self.DriverChair);
-			end
+            self.DriverFPV = self.DriverChair:GetThirdPersonMode();
+            self.DriverChair:SetThirdPersonMode(false);
+            self.Pilot:ExitVehicle(self.DriverChair);
 		end
 		self.num = 0;
 		self.Accel.FWD = 0;
@@ -282,14 +286,21 @@ function ENT:Exit(driver,kill)
 		self.Inflight = false;
 		self:SetNWEntity(self.Vehicle,nil);
 		self:SetNWBool("Flying" .. self.Vehicle,false);
+        
 		self.Accel.FWD = 0;
 	else
 		if(IsValid(self.Passenger)) then
 			self.Passenger:SetNWBool("Flying"..self.Vehicle,false);
 			self.Passenger:SetNWEntity(self.Vehicle,NULL)
 			self.Passenger:SetNWEntity("PassengerSeat",NULL);
-			self.Passenger:SetPos(self:GetPos()+self:GetUp()*20+self:GetForward()*5+self:GetRight()*85)
+			if(self.ExitModifier) then
+				self.Passenger:SetPos(self:GetPos() + self:GetRight() * -self.ExitModifier.x + self:GetForward() * self.ExitModifier.y + self:GetUp() * self.ExitModifier.z);
+			else
+				self.Passenger:SetPos((self:GetPos()+self:GetUp()*20+self:GetForward()*5+self:GetRight()*-85) or self.ExitPos);
+			end
 			if(kill) then self.Passenger:Kill() end;
+            self.PassengerFPV = self.PassengerChair:GetThirdPersonMode();
+            self.PassengerChair:SetThirdPersonMode(false);
 		end
 		self.Passenger = NULL;
 	end

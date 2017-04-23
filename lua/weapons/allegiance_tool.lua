@@ -96,7 +96,7 @@ if CLIENT then
 			if(IsValid(EyeTrace.Entity)) then
 				local e = EyeTrace.Entity;
 				local class = e:GetClass();
-				if(GetStarWarsVehicle(class) or e.IsSWVehicle) then
+				if(e.IsSWVehicle) then
 					return e.Allegiance;
 				end
 			end
