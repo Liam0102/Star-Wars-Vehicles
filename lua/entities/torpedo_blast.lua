@@ -22,28 +22,31 @@ if SERVER then
 		self:SetRenderMode(RENDERMODE_TRANSALPHA);
 		self:SetColor(Color(255,255,255,1));
 		self:StartMotionController();
-		self:SetCustomCollisionCheck(true)
+		//self:SetCustomCollisionCheck(true)
 		self:SetNWVector("Color",Vector(self.SpriteColour.r,self.SpriteColour.g,self.SpriteColour.b));
 
 		self:SetNWInt("StartSize",self.StartSize or 20);
 		self:SetNWInt("EndSize",self.EndSize or 15);
 		
 		self.Damage = self.Damage or 500;
-		
+
 		local phys = self:GetPhysicsObject();
 		phys:SetMass(100);
 		phys:EnableGravity(false);
 		phys:Wake()
 	end
 
+    /*
 	hook.Add("ShouldCollide","SW_TorpedoCollision", function(e1,e2)
 		if((e1.IsTorpedo and e2.IsSWVehicle) or (e1.IsSWVehicle and e2.IsTorpedo)) then
 			if(e1.IsTorpedo and e2 == e1.Shooter or e2.IsTorpedo and e1 == e2.Shooter) then
 				return false;
 			end	
-		end	
+		end
+        return true;
 	end);
-	
+	*/
+    
 	function ENT:PrepareTorpedo(e,s,vel)
 		self.Shooter = e;
 		e:EmitSound(s)

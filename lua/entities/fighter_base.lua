@@ -847,7 +847,6 @@ function ENT:FireTorpedo(pos,target,vel,dmg,c,size,ion,snd)
 	e.Ion = ion or false;
 	
 	local sound = snd or Sound("weapons/n1_cannon.wav");
-	constraint.NoCollide(self,e,0,0)
 	e:SetPos(pos);
 	e:SetAngles(self:GetAngles())
 	e:SetCollisionGroup(COLLISION_GROUP_PROJECTILE);
@@ -862,6 +861,7 @@ function ENT:FireTorpedo(pos,target,vel,dmg,c,size,ion,snd)
 	end
 	e:Spawn();
 	e:Activate();
+    constraint.NoCollide(self,e,0,0)
 end
 
 
@@ -888,7 +888,7 @@ function ENT:Handbrake()
 end
 
 local FlightPhys = {
-	secondstoarrive	= 0.85;
+	secondstoarrive	= 1;
 	maxangular		= 5000;
 	maxangulardamp	= 10000;
 	maxspeed			= 1000000;
@@ -905,7 +905,6 @@ function ENT:PhysicsSimulate( phys, deltatime )
 	if(!self.Done and !self.Tractored and (!self.DeactivateInWater or (self.DeactivateInWater and self:WaterLevel() < 3))) then
         if(self.Inflight and IsValid(self.Pilot)) then
 
-            -- Accelerate
             local pos = self:GetPos();
 
             if(!self.TakeOff and !self.Land) then
@@ -1047,7 +1046,7 @@ function ENT:PhysicsSimulate( phys, deltatime )
 
                 end
 
-                local fPos = self:GetPos()+(FWD*self.Accel.FWD)+(UP*self.Accel.UP);
+                local fPos = pos+(FWD*self.Accel.FWD)+(UP*self.Accel.UP);
                 if(self.CanStrafe) then
                     fPos = fPos+(RIGHT*self.Accel.RIGHT);
                 end
@@ -1068,7 +1067,6 @@ function ENT:PhysicsSimulate( phys, deltatime )
                 end
                 if(self.TakingOff) then
                     FlightPhys.pos = self.NewPos;
-
                 else
                     FlightPhys.pos = self.LandPos;
                 end
@@ -1130,6 +1128,7 @@ function ENT:PhysicsSimulate( phys, deltatime )
         end
 	end
 end
+    
 
 function SWVehStandbyPickup(p,e)
 	if(IsValid(e) and e.IsSWVehicle) then
@@ -1206,7 +1205,9 @@ function ENT:Bang()
 	for k,v in pairs(ents.FindInSphere(self:GetPos(),300)) do
 		if(IsValid(v) and v != self) then
 			if(v:IsPlayer() and v:Alive()) then
-				v:Kill();
+                if(!v:HasGodMode()) then
+				    v:Kill();
+                end
 			else
 				if((v.IsSWVehicle and !v.Done) or (!v.IsSWVehicle and v:GetParent() != self)) then
 					local dist = (self:GetPos() - v:GetPos()):Length();

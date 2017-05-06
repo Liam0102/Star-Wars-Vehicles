@@ -497,14 +497,14 @@ ENT.Roll = 0;
 ENT.YawAccel = 0;
 ENT.num = 0;
 function ENT:PhysicsSimulate( phys, deltatime )
-	
+	//if(IsValid(self.Pilot) and self.Pilot:KeyDown(IN_WALK)) then return end;
 	local UP = ZAxis;
 	local RIGHT = self.RightDir;
 	local FWD = self.FWDDir;
 	local worldZ;
 	self:RunTraces();
 	
-
+        
 	
 	if(!self.Tractored) then
 		if(self.Inflight and IsValid(self.Pilot)) then
