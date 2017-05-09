@@ -7,8 +7,7 @@ ENT.PrintName = "X-Wing"
 ENT.Author = "Liam0102"
 ENT.Category = "Star Wars Vehicles: Rebels"
 ENT.AutomaticFrameAdvance = true
-ENT.Spawnable = false;
-ENT.AdminSpawnable = false;
+
 
 ENT.EntModel = "models/xwing/xwingtwo1.mdl"
 ENT.Vehicle = "XWing"
