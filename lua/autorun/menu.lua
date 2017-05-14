@@ -23,9 +23,9 @@ function SWV_Spawn_SENT( player, EntityName, tr )
 	local PrintName = nil
 	local sent = scripted_ents.GetStored( EntityName )
 	if ( sent ) then
-
+            
 		local sent = sent.t
-
+        if(sent.AdminOnly and !player:IsAdmin()) then return end;
 		ClassName = EntityName
 
 		entity = sent:SpawnFunction( player, tr )
@@ -41,7 +41,7 @@ function SWV_Spawn_SENT( player, EntityName, tr )
 		if (!SpawnableEntities) then return end
 		local EntTable = SpawnableEntities[ EntityName ]
 		if (!EntTable) then return end
-
+        if(EntTable.AdminOnly and !player:IsAdmin()) then return end;
 		PrintName = EntTable.PrintName
 
 		local SpawnPos = tr.HitPos + tr.HitNormal * 16
@@ -81,7 +81,80 @@ function SWV_Spawn_SENT( player, EntityName, tr )
 
 end
 concommand.Add( "swv_spawnsent", function( ply, cmd, args ) SWV_Spawn_SENT( ply, args[1] ) end ) 
-    
+
+function SWV_CCGiveSWEP( player, command, arguments )
+
+	if ( arguments[1] == nil ) then return end
+
+	-- Make sure this is a SWEP
+	local swept = list.Get( "SWVehicles.Weapons" );
+	local swep;
+
+	for k,v in pairs(swept) do
+		if (v.ClassName==arguments[1]) then
+			swep = v; break;
+		end
+	end
+
+	if (swep == nil) then return end
+
+	-- You're not allowed to spawn this!
+	if (StarGate.NotSpawnable(arguments[1],player,"swep")) then return end
+
+	if ( !gamemode.Call( "PlayerGiveSWEP", player, arguments[1], swep ) ) then return end
+
+	MsgAll( "Giving "..player:Nick().." a "..swep.ClassName.."\n" )
+	player:Give( swep.ClassName )
+	-- And switch to it
+	player:SelectWeapon( swep.ClassName )
+
+end
+
+concommand.Add( "swv_giveswep", SWV_CCGiveSWEP )
+
+--[[---------------------------------------------------------
+	-- Give a swep.. duh.
+-----------------------------------------------------------]]
+function SWV_Spawn_Weapon( Player, wepname, tr )
+
+	if ( wepname == nil ) then return end
+
+	local swept = list.Get( "SWVehicles.Weapons" );
+	local swep;
+
+	for k,v in pairs(swept) do
+		if (v.ClassName==wepname) then
+			swep = v; break;
+		end
+	end
+
+	-- Make sure this is a SWEP
+	if ( swep == nil ) then return end
+
+	if ( !gamemode.Call( "PlayerSpawnSWEP", Player, wepname, swep ) ) then return end
+
+	if ( !tr ) then
+		tr = Player:GetEyeTraceNoCursor()
+	end
+
+	if ( !tr.Hit ) then return end
+
+	local entity = ents.Create( swep.ClassName )
+
+	if ( IsValid( entity ) ) then
+
+		entity:SetPos( tr.HitPos + tr.HitNormal * 32 )
+		entity:Spawn()
+
+		gamemode.Call( "PlayerSpawnedSWEP", Player, entity )
+
+	end
+
+
+end
+
+concommand.Add( "swv_spawnswep", function( ply, cmd, args ) SWV_Spawn_Weapon( ply, args[1] ) end )    
+
 end
 
 if(CLIENT) then
@@ -125,7 +198,14 @@ spawnmenu.AddContentType( "swvehicle", function( container, obj )
         menu:AddOption( "Copy to Clipboard", function() SetClipboardText( obj.spawnname ) end )
         menu:Open()
     end
+	icon.OpenMenu = function( icon )
 
+		local menu = DermaMenu()
+			menu:AddOption( "Copy to Clipboard", function() SetClipboardText( obj.spawnname ) end )
+			menu:AddOption( "Spawn Using Toolgun", function() RunConsoleCommand( "gmod_tool", "creator" ) RunConsoleCommand( "creator_type", "0" ) RunConsoleCommand( "creator_name", obj.spawnname ) end )
+		menu:Open()
+
+	end
 	if ( IsValid( container ) ) then
 		container:Add( icon )
 	end
@@ -133,7 +213,49 @@ spawnmenu.AddContentType( "swvehicle", function( container, obj )
 	return icon;
 
 end )
+spawnmenu.AddContentType( "swweapon", function( container, obj )
 
+	if ( !obj.material ) then return end
+	if ( !obj.nicename ) then return end
+	if ( !obj.spawnname ) then return end
+
+	local icon = vgui.Create( "ContentIcon", container )
+	icon:SetContentType( "weapon" )
+	icon:SetSpawnName( obj.spawnname )
+	icon:SetName( obj.nicename )
+	icon:SetMaterial( obj.material )
+	icon:SetAdminOnly( obj.admin )
+	icon:SetColor( Color( 135, 206, 250, 255 ) )
+	icon.DoClick = function()
+
+		RunConsoleCommand( "swv_giveswep", obj.spawnname )
+		surface.PlaySound( "ui/buttonclickrelease.wav" )
+
+	end
+
+	icon.DoMiddleClick = function()
+
+		RunConsoleCommand( "swv_spawnswep", obj.spawnname )
+		surface.PlaySound( "ui/buttonclickrelease.wav" )
+
+	end
+
+	icon.OpenMenu = function( icon )
+
+		local menu = DermaMenu()
+			menu:AddOption( "Copy to Clipboard", function() SetClipboardText( obj.spawnname ) end )
+			menu:AddOption( "Spawn Using Toolgun", function() RunConsoleCommand( "gmod_tool", "creator" ) RunConsoleCommand( "creator_type", "3" ) RunConsoleCommand( "creator_name", obj.spawnname ) end )
+		menu:Open()
+
+	end
+
+	if ( IsValid( container ) ) then
+		container:Add( icon )
+	end
+
+	return icon
+
+end )
 hook.Add( "SWVehiclesTab", "AddEntityContent", function( pnlContent, tree, node )
 
 	local Categorised = {}
@@ -188,11 +310,11 @@ hook.Add( "SWVehiclesTab", "AddEntityContent", function( pnlContent, tree, node 
 			self.PropPanel:SetTriggerSpawnlistChange( false )
 
 			for k, ent in SortedPairsByMemberValue( v, "PrintName" ) do
-                local enttype = ent.ScriptedEntityType or "entity";
+                local enttype = "swvehicle"
                 if(CategoryName == "Weapons") then
                     enttype = "weapon";
                 end
-				spawnmenu.CreateContentIcon("swvehicle", self.PropPanel, {
+				spawnmenu.CreateContentIcon(enttype, self.PropPanel, {
 					nicename	= ent.PrintName or ent.ClassName,
 					spawnname	= ent.ClassName,
 					material	= "entities/" .. ent.ClassName .. ".vmt",

@@ -50,13 +50,6 @@ function CreateBulletStructure(dmg,color,nosplashdamage)
 					util.BlastDamage( self, self.Pilot or self, tr.HitPos, dmg*1.5, dmg*0.66)
 				end
 				
-				if(tr.Entity.IsSWVehicle and tr.Entity.Inflight) then
-					if(!tr.Entity.AdminOnly) then
-						tr.Entity:GetPhysicsObject():AddAngleVelocity(tr.HitNormal * math.Clamp(tr.Entity.Mass/2,3750,7500));
-					end
-				end
-				
-				
 				
 				if(color == "blue" and !noion) then
 					if(tr.Entity.IsSWVehicle) then
