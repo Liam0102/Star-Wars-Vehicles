@@ -28,7 +28,7 @@ function SWV_Spawn_SENT( player, EntityName, tr )
         if(sent.AdminOnly and !player:IsAdmin()) then return end;
 		ClassName = EntityName
 
-		entity = sent:SpawnFunction( player, tr )
+		entity = sent:SpawnFunction( player, tr, EntityName )
 
 		ClassName = nil
 
@@ -317,7 +317,7 @@ hook.Add( "SWVehiclesTab", "AddEntityContent", function( pnlContent, tree, node 
 				spawnmenu.CreateContentIcon(enttype, self.PropPanel, {
 					nicename	= ent.PrintName or ent.ClassName,
 					spawnname	= ent.ClassName,
-					material	= "entities/" .. ent.ClassName .. ".vmt",
+					material	= "entities/" .. ent.ClassName .. ".png",
 					admin		= ent.AdminOnly or false,
                     author		= ent.Author,
                     info		= ent.Instructions,
