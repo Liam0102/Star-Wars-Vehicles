@@ -165,20 +165,9 @@ if CLIENT then
 	end
 	
 	ENT.CanFPV = false;
-	local View = {}
-	local function CalcView()
-		
-		local p = LocalPlayer();
-		local self = p:GetNetworkedEntity("Delta", NULL)
+    ENT.ViewDistance = 700;
+    ENT.ViewHeight = 200;
 
-		if(IsValid(self)) then
-			local fpvPos = self:GetPos()+self:GetUp()*200+p:GetAimVector():GetNormal()*-700;
-			View = SWVehicleView(self,700,200,fpvPos);		
-			return View;
-		end
-	end
-	hook.Add("CalcView", "DeltaView", CalcView)
-	
 
 	function DeltaReticle()
 		

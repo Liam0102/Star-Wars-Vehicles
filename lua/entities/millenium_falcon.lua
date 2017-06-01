@@ -59,7 +59,7 @@ function ENT:Initialize()
 	self.AlternateFire = true;
 	self.FireGroup = {"TopRight","TopLeft","BottomRight","BottomLeft"}
 	self.Bullet = CreateBulletStructure(200,"red");
-	
+	self.HasLightspeed = true;
 	self.BaseClass.Initialize(self)
 
 end
@@ -117,20 +117,9 @@ if CLIENT then
 		
 	end
 	
-	//"ambient/atmosphere/ambience_base.wav"
-	local View = {}
-	local function CalcView()
-		
-		local p = LocalPlayer();
-		local self = p:GetNWEntity("Falcon")
-		local pos,face;
-		if(IsValid(self)) then
-			local fpvPos = self:GetPos()+self:GetRight()*320+self:GetUp()*140+self:GetForward()*160;
-			View = SWVehicleView(self,1000,250,fpvPos);		
-			return View;
-		end
-	end
-	hook.Add("CalcView", "FalconView", CalcView)
+    ENT.ViewDistance = 1000;
+    ENT.ViewHeight = 250;
+    ENT.FPVPos = Vector(160,-320,140);
 	
 	function ENT:FlightEffects()
 		local normal = (self:GetForward() * -1):GetNormalized()

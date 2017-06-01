@@ -193,18 +193,9 @@ if CLIENT then
 		
 	end
 	
-	local View = {}
-	local function CalcView()
-		
-		local p = LocalPlayer();
-		local self = p:GetNetworkedEntity("EtaR", NULL)
-		if(IsValid(self)) then
-			local fpvPos = self:GetPos()+self:GetUp()*60+self:GetForward()*-25;
-			View = SWVehicleView(self,700,200,fpvPos);		
-			return View;
-		end
-	end
-	hook.Add("CalcView", "EtaRView", CalcView)
+    ENT.ViewDistance = 700;
+    ENT.ViewHeight = 200;
+    ENT.FPVPos = Vector(-25,0,60);
 	
 	local HUD = surface.GetTextureID("vgui/eta_cockpit");
 	function EtaRReticle()

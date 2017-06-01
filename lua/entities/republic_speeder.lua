@@ -121,7 +121,7 @@ if CLIENT then
 		end
 		
 	end
-
+    ENT.HasCustomCalcView = true;
 	local View = {}
 	function CalcView()
 		

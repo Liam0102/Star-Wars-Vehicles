@@ -74,18 +74,9 @@ if CLIENT then
 		Engine=Sound("vehicles/tie/tie_interceptor4.wav"),
 	}
 	
-	local View = {}
-	function CalcView()
-		
-		local p = LocalPlayer();
-		local self = p:GetNetworkedEntity("TIEInterceptor", NULL)
-		if(IsValid(self)) then
-			local fpvPos = self:GetPos()+self:GetUp()*180+self:GetRight()*-15+self:GetForward()*50;	
-			View = SWVehicleView(self,700,300,fpvPos);		
-			return View;
-		end
-	end
-	hook.Add("CalcView", "TIEInterceptorView", CalcView)
+    ENT.ViewDistance = 700;
+    ENT.ViewHeight = 300;
+    ENT.FPVPos = Vector(50,15,180);
 	
 	local HUD = surface.GetTextureID("vgui/tie_cockpit");
 	function TIEInterceptorReticle()

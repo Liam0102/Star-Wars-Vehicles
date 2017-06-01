@@ -175,21 +175,10 @@ if CLIENT then
 		end
 	
 	end
-	
-	//"ambient/atmosphere/ambience_base.wav"
-	local View = {}
-	local function CalcView()
-		
-		local p = LocalPlayer();
-		local self = p:GetNWEntity("Slave")
-
-		if(IsValid(self)) then
-			local fpvPos = self:GetPos()+self:GetUp()*400+self:GetForward()*10;
-			View = SWVehicleView(self,1000,500,fpvPos);
-			return View;
-		end
-	end
-	hook.Add("CalcView", "SlaveView", CalcView)
+    
+    ENT.ViewDistance = 1000;
+    ENT.ViewHeight = 500;
+    ENT.FPVPos = Vector(10,0,400);
 	
 	local HUD = surface.GetTextureID("vgui/slave_cockpit")
 	function SlaveReticle()

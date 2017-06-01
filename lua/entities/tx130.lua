@@ -235,7 +235,7 @@ if CLIENT then
 	ENT.Sounds={
 		Engine=Sound("ambient/atmosphere/ambience_base.wav"),
 	}
-	
+	ENT.HasCustomCalcView = true;
 	local Health = 0;
 	local Target;
 	local Turret;

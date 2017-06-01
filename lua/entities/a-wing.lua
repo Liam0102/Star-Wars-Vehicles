@@ -120,19 +120,10 @@ if CLIENT then
 		
 	end
 	
-	//"ambient/atmosphere/ambience_base.wav"
-	local View = {}
-	local function CalcView()
-		
-		local p = LocalPlayer();
-		local self = p:GetNetworkedEntity("AWing", NULL)
-		if(IsValid(self)) then
-			local fpvPos = self:GetPos()+self:GetForward()*15+self:GetUp()*80+self:GetRight()*4;
-			View = SWVehicleView(self,700,200,fpvPos);		
-			return View;
-		end
-	end
-	hook.Add("CalcView", "AWingView", CalcView)
+	ENT.ViewDistance = 700;
+    ENT.ViewHeight = 200;
+    ENT.FPVPos = Vector(15,-4,80);
+
 	
 	local HUD = surface.GetTextureID("vgui/awing_cockpit");
 	local Glass = surface.GetTextureID("models/props_c17/frostedglass_01a_dx60")

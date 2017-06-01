@@ -23,8 +23,8 @@ ENT.NextUse = {Wings = CurTime(),Use = CurTime(),Fire = CurTime(),FireMode = Cur
 
 
 AddCSLuaFile();
-function ENT:SpawnFunction(pl, tr)
-	local e = ents.Create("x-wing");
+function ENT:SpawnFunction(pl, tr, ClassName)
+	local e = ents.Create(ClassName);
 	e:SetPos(tr.HitPos + Vector(0,0,20));
 	e:SetAngles(Angle(0,pl:GetAimVector():Angle().Yaw,0));
 	e:Spawn();
@@ -256,17 +256,10 @@ if CLIENT then
         end
 	end
 
-	local View = {}
-	local function CalcView()
-		local p = LocalPlayer();
-		local self = p:GetNetworkedEntity("XWing", NULL)
-		if(IsValid(self)) then
-			local fpvPos = self:GetPos()+self:GetForward()*70+self:GetUp()*92;
-			View = SWVehicleView(self,700,200,fpvPos);		
-			return View;
-		end
-	end
-	hook.Add("CalcView", "XWingView", CalcView)
+    ENT.ViewDistance = 700;
+    ENT.ViewHeight = 200;
+    ENT.FPVPos = Vector(70,0,92);
+
 	
 	local HUD = surface.GetTextureID("vgui/xwing2_cockpit")
 	local Glass = surface.GetTextureID("models/props_c17/frostedglass_01a_dx60")

@@ -168,18 +168,9 @@ if CLIENT then
 
 	end
 	
-	local View = {}
-	local function CalcView()
-
-		local p = LocalPlayer();
-		local self = p:GetNetworkedEntity("ARC170", NULL)
-		if(IsValid(self)) then
-			local fpvPos = self:GetPos()+self:GetUp()*130+self:GetForward()*80+self:GetRight()*-3;
-			View = SWVehicleView(self,700,200,fpvPos);		
-			return View;
-		end
-	end
-	hook.Add("CalcView", "ARC170View", CalcView) // Change the second string to the name of your vehicle plus "View"
+    ENT.ViewDistance = 700;
+    ENT.ViewHeight = 200;
+    ENT.FPVPos = Vector(80,3,130);
 	
 	local HUD = surface.GetTextureID("vgui/arc_cockpit");
 	ENT.CanFPV = true;

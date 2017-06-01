@@ -173,20 +173,9 @@ if CLIENT then
 		
 	end
 	
-	//"ambient/atmosphere/ambience_base.wav"
-	local View = {}
-	local function CalcView()
-		
-		local p = LocalPlayer();
-		local self = p:GetNetworkedEntity("YWing", NULL)
-
-		if(IsValid(self)) then
-			local fpvPos = self:GetPos()+self:GetForward()*95+self:GetUp()*88;
-			View = SWVehicleView(self,700,200,fpvPos);
-			return View;
-		end
-	end
-	hook.Add("CalcView", "YWingView", CalcView)
+    ENT.ViewDistance = 700;
+    ENT.ViewHeight = 200;
+    ENT.FPVPos = Vector(95,0,88);
 	
 	local HUD = surface.GetTextureID("vgui/ywing_cockpit");
 	function YWingReticle()

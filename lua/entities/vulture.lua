@@ -84,19 +84,9 @@ if CLIENT then
 		end
 	end
 	
-	local View = {}
-	local function CalcView()
-		
-		local p = LocalPlayer();
-		local self = p:GetNetworkedEntity("Vulture", NULL)
+    ENT.ViewDistance = 700;
+    ENT.ViewHeight = 200;
 
-		if(IsValid(self)) then
-			View = SWVehicleView(self,700,200,self:GetPos());
-			return View;
-		end
-	end
-	hook.Add("CalcView", "VultureView", CalcView)
-	
 	function VultureReticle()
 		
 		local p = LocalPlayer();

@@ -90,7 +90,7 @@ if CLIENT then
 	ENT.Sounds={
 		Engine=Sound("vehicles/speederbike/speederbike_engine.wav"),
 	}
-	
+	ENT.HasCustomCalcView = true;
 	local Health = 0;
 	local Speed = 0;
 	function ENT:Think()

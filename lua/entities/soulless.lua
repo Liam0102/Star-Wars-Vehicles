@@ -76,17 +76,8 @@ if CLIENT then
 		self.BaseClass.Initialize(self);
 	end
 	
-	local View = {}
-	local function CalcView()
-		
-		local p = LocalPlayer();
-		local self = p:GetNetworkedEntity("Soulless", NULL)
-		if(IsValid(self)) then
-			View = SWVehicleView(self,700,300,fpvPos);		
-			return View;
-		end
-	end
-	hook.Add("CalcView", "SoullessView", CalcView)
+    ENT.ViewDistance = 700;
+    ENT.ViewHeight = 300;
 	
 	function ENT:Effects()
 	

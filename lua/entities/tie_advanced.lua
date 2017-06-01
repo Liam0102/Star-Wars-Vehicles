@@ -85,20 +85,10 @@ if CLIENT then
 		end
 		self.BaseClass.Think(self);
 	end
-
-	//"ambient/atmosphere/ambience_base.wav"
-	local View = {}
-	local function CalcView()
-		
-		local p = LocalPlayer();
-		local self = p:GetNetworkedEntity("TieAdvanced", NULL)
-		if(IsValid(self)) then
-			local fpvPos = self:GetPos()+self:GetUp()*85+self:GetForward()*40;
-			View = SWVehicleView(self,700,300,fpvPos);
-			return View;
-		end
-	end
-	hook.Add("CalcView", "TieAdvancedView", CalcView)
+    
+    ENT.ViewDistance = 700;
+    ENT.ViewHeight = 300;
+    ENT.FPVPos = Vector(40,0,85);
 
 	local HUD = surface.GetTextureID("vgui/tie_cockpit");
 	local Glass = surface.GetTextureID("models/props_c17/frostedglass_01a_dx60");

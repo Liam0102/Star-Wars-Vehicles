@@ -177,18 +177,9 @@ if CLIENT then
 		self.BaseClass.Initialize(self);
 	end
 	
-	local View = {}
-	function CalcView()
-		
-		local p = LocalPlayer();
-		local self = p:GetNetworkedEntity("N1v2", NULL)
-		if(IsValid(self)) then
-			local fpvPos = self:GetPos()+self:GetUp()*67.5+self:GetForward()*-31;
-			View = SWVehicleView(self,575,125,fpvPos,true);		
-			return View;
-		end
-	end
-	hook.Add("CalcView", "N1v2View", CalcView)
+    ENT.ViewDistance = 575;
+    ENT.ViewHeight = 125;
+    ENT.FPVPos = Vector(-31,0,67.5);
 	
 	function ENT:Effects()
 	

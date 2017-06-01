@@ -97,19 +97,9 @@ if CLIENT then
 		end		
 	end
 
-	//"ambient/atmosphere/ambience_base.wav"
-	local View = {}
-	local function CalcView()
-		
-		local p = LocalPlayer();
-		local self = p:GetNetworkedEntity("TieBomber", NULL);	
-		if(IsValid(self)) then			
-			local fpvPos = self:GetPos()+self:GetForward()*120+self:GetUp()*85+self:GetRight()*60;
-			View = SWVehicleView(self,700,300,fpvPos);
-			return View;
-		end
-	end
-	hook.Add("CalcView", "TieBomberView", CalcView)
+    ENT.ViewDistance = 700;
+    ENT.ViewHeight = 300;
+    ENT.FPVPos = Vector(120,-60,85);
 
 	local HUD = surface.GetTextureID("vgui/tie_cockpit");
 	function TieBomberReticle()

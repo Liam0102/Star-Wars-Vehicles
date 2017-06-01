@@ -163,17 +163,8 @@ if CLIENT then
 		self.BaseClass.Think(self);
 	end
 	
-	local View = {}
-	local function CalcView()
-		
-		local p = LocalPlayer();
-		local self = p:GetNetworkedEntity("Headhunter", NULL)
-		if(IsValid(self)) then
-			View = SWVehicleView(self,800,200,fpvPos);		
-			return View;
-		end
-	end
-	hook.Add("CalcView", "HeadhunterView", CalcView)
+	ENT.ViewDistance = 800;
+    ENT.ViewHeight = 200;
 	
 	function HeadhunterReticle()
 		

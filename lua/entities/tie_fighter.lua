@@ -112,20 +112,9 @@ if CLIENT then
 		end
 	end)
 
-	//"ambient/atmosphere/ambience_base.wav"
-	local View = {}
-	local function CalcView()
-		
-		local p = LocalPlayer();
-		local self = p:GetNetworkedEntity("Tie", NULL)
-
-		if(IsValid(self)) then
-			local fpvPos = self:GetPos()+self:GetUp()*180+self:GetRight()*-15+self:GetForward()*30.6
-			View = SWVehicleView(self,700,300,fpvPos,true);
-			return View;
-		end
-	end
-	hook.Add("CalcView", "TieView", CalcView)
+	ENT.ViewDistance = 700;
+    ENT.ViewHeight = 300;
+    ENT.FPVPos = Vector(30.6,15,180);
 
 	function TieReticle()
 		

@@ -91,18 +91,8 @@ if CLIENT then
 		self.BaseClass.Initialize(self);
 	end
 	
-	
-	local View = {}
-	local function CalcView()
-		
-		local p = LocalPlayer();
-		local self = p:GetNetworkedEntity("DroidTri", NULL)
-		if(IsValid(self)) then
-			View = SWVehicleView(self,700,200,fpvPos);		
-			return View;
-		end
-	end
-	hook.Add("CalcView", "DroidTriView", CalcView)
+	ENT.ViewDistance = 700;
+    ENT.ViewHeight = 200;
 	
 	function ENT:FlightEffects()
 		local normal = (self:GetForward() * -1):GetNormalized()

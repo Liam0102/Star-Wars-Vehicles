@@ -6,6 +6,8 @@ ENT.AutomaticFrameAdvance = true;
 ENT.IsSWVehicle = true;
 
 if SERVER then
+    
+    
 function CreateBulletStructure(dmg,color,nosplashdamage)
 	if(color == "blue" and dmg/2 > 30) then
 		dmg = 30;
@@ -108,7 +110,7 @@ function ENT:SW_LoadConfig()
 	end
 end
 
-ENT.NextUse = {Wings = CurTime(),Use = CurTime(),Fire = CurTime(),FireMode = CurTime(),FireBlast=CurTime(),DockCheck=CurTime(),Lock=CurTime(),AutoCorrect=CurTime()};
+ENT.NextUse = {Wings = CurTime(),Use = CurTime(),Fire = CurTime(),FireMode = CurTime(),FireBlast=CurTime(),DockCheck=CurTime(),Lock=CurTime(),AutoCorrect=CurTime(),LightSpeed=CurTime(),Switch=CurTime(),};
 ENT.DeactivateInWater = true;
    
 AddCSLuaFile();
@@ -140,6 +142,15 @@ function ENT:Initialize()
         
     if(!self.IsCapitalShip) then
        self.CanEject = true;     
+    end
+    
+	self.WarpDestination = Vector(0,0,0);
+    if(self.HasLightspeed) then
+        if(WireLib) then
+            Wire_CreateInputs(self, { "Destination [VECTOR]", })
+        else
+            self.DistanceMode = true;
+        end
     end
 	
 	if(not self.Bullet) then
@@ -197,6 +208,10 @@ function ENT:Initialize()
 	
 	self:SW_LoadConfig();
 	self:ConfigVars();
+        
+    if(self.HasSeats) then
+        self:SpawnSeats();
+    end
 	
 	if(!Should_LockOn) then
 		self.ShouldLock = false;
@@ -502,6 +517,8 @@ function ENT:FireWeapons()
 			
 			self.Bullet.Attacker = self.Pilot or self;
 			self.Bullet.Src		= v:GetPos();
+            local spread = self.Accel.FWD/1000;
+            self.Bullet.Spread = Vector(spread,spread,spread);
 			
 			self.Bullet.Dir = angPos
 
@@ -525,6 +542,73 @@ function ENT:FireWeapons()
 		self.NextUse.Fire = CurTime() + (self.FireDelay or 0.2)*0.8;
 	end
 end
+    
+function ENT:SpawnSeats()
+    if(!self.SeatPos) then 
+        print("Unable to Spawn Passengers! No Positions Set")
+        return;
+    end
+	self.Seats = {};
+	for k,v in pairs(self.SeatPos) do
+		local e = ents.Create(self.SeatClass or "prop_vehicle_prisoner_pod");
+		e:SetPos(v[1] or self:GetPos());
+		e:SetAngles(v[2] or self:GetAngles());
+		e:SetParent(self);		
+		e:SetModel("models/nova/airboat_seat.mdl");
+		e:SetRenderMode(RENDERMODE_TRANSALPHA);
+        e:SetColor(Color(255,255,255,0));
+		e:Spawn();
+		e:Activate();
+		e:SetUseType(USE_OFF);
+		e:GetPhysicsObject():EnableMotion(false);
+		e:GetPhysicsObject():EnableCollisions(false);
+        e:SetCollisionGroup(COLLISION_GROUP_WEAPON);
+		e["Is" .. self.Vehicle .. "Seat"] = true;
+		e[self.Vehicle] = self;
+        e._ExitPos = v[3] or Vector(0,0,0);
+		self.Seats[k] = e;
+        if(self.DisableThirdpersonSeats) then
+            e:SetNWBool("NoFirstPerson",true);
+        end
+	end
+
+end
+
+function ENT:Passenger(p)
+    if(self.Pilot == p) then return end;
+	if(self.NextUse.Use > CurTime()) then return end;
+	for k,v in pairs(self.Seats) do
+		if(v:GetPassenger(1) == NULL) then
+			p:EnterVehicle(v);
+			return;			
+		end
+	end
+end
+    
+hook.Add("PlayerEnteredVehicle","SWVehicleSeatEnter", function(p,v)
+	if(IsValid(v) and IsValid(p)) then
+        local e = v:GetParent();
+		if(v["Is" .. e.Vehicle .. "Seat"]) then
+			p:SetNetworkedEntity(e.Vehicle .. "Seat",v);
+			p:SetNetworkedEntity(e.Vehicle,v:GetParent());
+			p:SetNetworkedBool(e.Vehicle .. "Passenger",true);
+		end
+	end
+end);
+    
+hook.Add("PlayerLeaveVehicle", "SWVehicleSeatExit", function(p,v)
+	if(IsValid(p) and IsValid(v)) then
+        v:SetThirdPersonMode(false);
+        local e = v:GetParent();
+		if(v["Is" .. e.Vehicle .. "Seat"]) then
+			p:SetNetworkedEntity(e.Vehicle .. "Seat",NULL);
+			p:SetNetworkedEntity(e.Vehicle,NULL);
+			p:SetNetworkedBool(e.Vehicle .. "Passenger",false);
+            local pos = e:LocalToWorld(v._ExitPos or Vector(0,0,0));
+			p:SetPos(pos);
+		end
+	end
+end);
 
 function ENT:FindTarget()
 	local corner1, corner2 = self:GetModelBounds();
@@ -599,6 +683,11 @@ function ENT:Think()
 
 
 	if(self.Inflight) then
+        if CAF and CAF.GetAddon("Spacebuild") then
+            if(IsValid(self.Pilot) and self.Pilot.LsResetSuit) then
+                self.Pilot:LsResetSuit()
+            end
+        end
         if(IsValid(self.Pilot)) then
             if(self.PilotOffset) then
                 self.Pilot:SetPos(self:GetPos()+self:GetRight()*self.PilotOffset.x+self:GetForward()*self.PilotOffset.y+self:GetUp()*self.PilotOffset.z);
@@ -638,7 +727,41 @@ function ENT:Think()
 		end
 		
 		if(IsValid(self.Pilot)) then
-			
+
+            if(self.HasLightspeed) then
+                if((self.HasWings and self.Wings) or (!self.HasWings)) then
+                    if(self.Pilot:KeyDown(IN_SPEED)  and self.Pilot:KeyDown(IN_JUMP) and self.NextUse.LightSpeed < CurTime()) then
+                        if(!self.LightSpeed and !self.HyperdriveDisabled) then
+                            self.LightSpeed = true;
+                            self.LightSpeedTimer = CurTime() + 3;
+                            self.NextUse.LightSpeed = CurTime() + 20;
+
+                        end
+                    end
+                end
+
+                if(WireLib) then
+                    if(self.Pilot:KeyDown(IN_RELOAD) and self.Pilot:KeyDown(IN_SPEED) and self.NextUse.Switch < CurTime()) then
+                        if(!self.DistanceMode) then
+                            self.DistanceMode = true;
+                            self.Pilot:ChatPrint("LightSpeed Mode: Distance");
+                        else
+                            self.DistanceMode = false;
+                            self.Pilot:ChatPrint("LightSpeed Mode: Destination");
+                        end
+                        self.NextUse.Switch = CurTime() + 1;
+                    end
+                end
+
+                if(self.LightSpeed) then
+                    if(self.DistanceMode) then
+                        self:PunchingIt(self:GetPos()+self:GetForward()*20000);
+                    else
+                        self:PunchingIt(self.WarpDestination);
+                    end
+                end
+            end
+
 			if(self.Pilot:KeyDown(IN_USE)) then
 				if(self.NextUse.Use < CurTime()) then
                     if(self.Pilot:KeyDown(IN_JUMP) and self.CanEject) then
@@ -652,10 +775,10 @@ function ENT:Think()
 			if(IsValid(self.Pilot) and self.Pilot:KeyDown(IN_DUCK) and self.Pilot:KeyDown(IN_RELOAD)) then
 				self:ToggleAssist();
 			end
-			
+
 			if(self.HasWings) then
 				if(IsValid(self.Pilot)) then
-					if(self.Pilot:KeyDown(IN_SPEED) and self.NextUse.Wings < CurTime()) then
+					if(self.Pilot:KeyDown(IN_SPEED) and (!self.Pilot:KeyDown(IN_JUMP) or !self.HasLightspeed) and !self.LightSpeed and self.NextUse.Wings < CurTime()) then
 						self:ToggleWings();
 					end
 				end
@@ -727,6 +850,53 @@ function ENT:Think()
 	end
 
 end
+    
+function ENT:PunchingIt(Dest)
+	if(!self.PunchIt) then
+		if(self.LightSpeedTimer > CurTime()) then
+			self.ForwardSpeed = 0;
+			self.BoostSpeed = 0;
+			self.UpSpeed = 0;
+			self.Accel.FWD = 0;
+			self:SetNWInt("LightSpeed",1);
+			if(!self.PlayedSound) then
+				self:EmitSound(self.HyperDriveSound or Sound("vehicles/hyperdrive.mp3"),100);
+				self.PlayedSound = true;
+			end
+			//util.ScreenShake(self:GetPos()+self:GetForward()*-730+self:GetUp()*195+self:GetRight()*3,5,5,10,5000)
+		else
+			self.Accel.FWD = 4000;
+			self.LightSpeedWarp = CurTime()+0.5;
+			self.PunchIt = true;
+			self:SetNWInt("LightSpeed",2);
+		end
+	
+	else
+		if(self.LightSpeedWarp < CurTime()) then
+			
+			self.LightSpeed = false;
+			self.PunchIt = false;
+			self.ForwardSpeed = self.OGForward;
+			self.BoostSpeed = self.OGBoost;
+			self.UpSpeed = self.OGUp;
+			self:SetNWInt("LightSpeed",0);
+			local fx = EffectData()
+				fx:SetOrigin(self:GetPos())
+				fx:SetEntity(self)
+			util.Effect("propspawn",fx)
+			self:EmitSound("ambient/levels/citadel/weapon_disintegrate2.wav", 500)
+			self:SetPos(Dest);
+			self.PlayedSound = false;
+		end
+	end
+end
+
+function ENT:TriggerInput(k,v)
+	if(k == "Destination") then
+		self.WarpDestination = v;
+	end
+end
+
 
 function ENT:ToggleAssist()
 	if(self.NextUse.AutoCorrect < CurTime()) then
@@ -848,10 +1018,17 @@ end
 
 
 function ENT:Use(p)
-
-	if(!self.Inflight and (self.NextUse.Use < CurTime())) then
-		self:Enter(p);
-	end
+    if(!p:KeyDown(IN_WALK)) then
+        if(!self.Inflight and (self.NextUse.Use < CurTime())) then
+            self:Enter(p);
+        elseif(self.Inflight and self.HasSeats) then
+            self:Passenger(p);
+        end
+    else
+        if(self.HasSeats) then
+            self:Passenger(p);
+        end
+    end
 end
 
 function ENT:TestLoc(pos)
@@ -962,20 +1139,18 @@ function ENT:PhysicsSimulate( phys, deltatime )
             local pos = self:GetPos();
 
             if(!self.TakeOff and !self.Land) then
-
+                self.Handbraking = false;
                 if(!self.CriticalDamage) then
-                    if(self.Pilot:KeyDown(IN_FORWARD)) then
-                        self.Throttle.FWD = self.Throttle.FWD + self.Acceleration;
-                    elseif(self.Pilot:KeyDown(IN_BACK)) then
-                        self.Throttle.FWD = self.Throttle.FWD - self.Acceleration;
-                    elseif(self.Pilot:KeyDown(IN_RELOAD) and self.Pilot:KeyDown(IN_JUMP)) then
+                    if(self.Pilot:KeyDown(IN_RELOAD) and self.Pilot:KeyDown(IN_JUMP)) then
                         self:Handbrake();
+                    else
+                        if(self.Pilot:KeyDown(IN_FORWARD)) then
+                            self.Throttle.FWD = self.Throttle.FWD + self.Acceleration;
+                        elseif(self.Pilot:KeyDown(IN_BACK)) then
+                            self.Throttle.FWD = self.Throttle.FWD - self.Acceleration;
+                        end
                     end
-
-                    if(self.Pilot:KeyReleased(IN_RELOAD) or self.Pilot:KeyReleased(IN_JUMP)) then
-                        self.Handbraking = false;
-                    end
-
+                        
                     local min,max;
                     if(self.CanBack) then
                         min = (self.ForwardSpeed*0.66)*-1;
@@ -1255,6 +1430,16 @@ function ENT:Bang()
 	if(self.Inflight) then
 		self:Exit(true); --Let the player out...
 	end
+        
+    if(self.Seats) then
+        for k,v in pairs(self.Seats) do
+            local p = v:GetPassenger(1);
+            if(IsValid(p)) then
+                p:ExitVehicle(v);
+                p:Kill();
+            end
+        end
+    end
 
 	for k,v in pairs(ents.FindInSphere(self:GetPos(),300)) do
 		if(IsValid(v) and v != self) then
@@ -1459,6 +1644,7 @@ if CLIENT then
 				MaxSpeed = p:GetNWInt("SW_MaxSpeed") or self:GetNWInt("MaxSpeed");
 				Wings = p:GetNWBool("SW_Wings") or self:GetNWBool("Wings");
 				LandDistance = self:GetNWInt("LandDistance");
+                self.Lightspeed = self:GetNWInt("Lightspeed");
 			end
 			
 			if(input.IsMouseDown(MOUSE_MIDDLE)) then
@@ -1595,16 +1781,13 @@ if CLIENT then
 			self.SoundsOn[mode] = nil;
 		end
 	end
-	
-	local View = {};
+
 	function SWVehicleView(self,dist,udist,fpv_pos,lookaround)
 		local p = LocalPlayer();
 		local pos,face;
-			
+		local View = {};
 		if(IsValid(self)) then
 			if(self.IsFPV and ShouldFPV) then
-
-
 				pos = fpv_pos;
 				face = self:GetAngles();
 				if(lookaround and p:KeyPressed(IN_SCORE)) then
@@ -1616,18 +1799,23 @@ if CLIENT then
 					face = Angle(newAng.p,math.Clamp(newAng.y,self:GetAngles().y-90,self:GetAngles().y+90),newAng.r);
 				end
 			else
-				local aim = LocalPlayer():GetAimVector();
-				//aim:Rotate(self:GetAngles())
-				local tpos = self:GetPos()+self:GetUp()*udist+aim:GetNormal()*-(dist+p.SW_ViewDistance);
-				local tr = util.TraceLine({
-					start = self:GetPos(),
-					endpos = tpos,
-					filter = self.Filter,
-				})
-				pos = tr.HitPos or tpos;
-			//	pos = self:GetPos()+self:GetUp()*udist+self:GetForward()*-(dist+p.SW_ViewDistance);
-				face = ((self:GetPos() + Vector(0,0,100))- pos):Angle();
-			//	face = self:GetAngles();
+                if(self.Lightspeed != 2) then
+                    local aim = LocalPlayer():GetAimVector();
+                    local tpos = self:GetPos()+self:GetUp()*udist+aim:GetNormal()*-(dist+p.SW_ViewDistance);
+                    local tr = util.TraceLine({
+                        start = self:GetPos(),
+                        endpos = tpos,
+                        filter = self.Filter,
+                    })
+                    pos = tr.HitPos or tpos;   
+                    face = ((self:GetPos() + Vector(0,0,100))- pos):Angle();
+                    self._LastViewPos = pos;
+                    self._LastViewAng = face;
+                else
+                    pos = self._LastViewPos;
+                    face = self._LastViewAng;
+                end
+                
 			end
 			View.origin = pos;
 			View.angles = face;
@@ -1635,6 +1823,33 @@ if CLIENT then
 		end
 		
 	end
+    
+	
+	hook.Add("CalcView", "SWVehicleView", function(p)
+        local View = {};
+		local Piloting = p:GetViewEntity() != p and p:GetViewEntity().IsSWVehicle;
+        local IsPassenger  = IsValid(p:GetVehicle()) and IsValid(p:GetVehicle():GetParent()) and p:GetVehicle():GetParent().IsSWVehicle;
+		local pos, face, self;		
+		if(Piloting) then
+            self = p:GetViewEntity();
+			if(IsValid(self) and !self.HasCustomCalcView) then				
+				local pos = self:LocalToWorld(self.FPVPos or Vector(0,0,0));
+				View = SWVehicleView(self,self.ViewDistance or 800,self.ViewHeight or 250,pos,true)
+				return View;
+			end
+		elseif(IsPassenger) then
+			self = p:GetVehicle():GetParent();
+            local v = p:GetVehicle();
+            local NoFirstPerson = v:GetNWBool("NoFirstPerson");
+			if(IsValid(v) and IsValid(self) and !self.HasCustomCalcView) then
+				if(v:GetThirdPersonMode() or NoFirstPerson) then
+					View = SWVehicleView(self,self.ViewDistance or 800,self.ViewHeight or 250)
+					return View;
+				end
+			end
+		end
+		
+	end)
 	
 	function SW_WeaponReticles(self)
 
@@ -1779,6 +1994,7 @@ if CLIENT then
 		
 		surface.SetTextPos(x,y + tH/2);
 		surface.DrawText(health)
+        
 	end
 	
 	function SW_HUD_DrawSpeedometer()
@@ -1995,7 +2211,9 @@ if CLIENT then
 		end
 			
 
-	
+        if(self.Lightspeed == 2) then
+            DrawMotionBlur( 0.4, 20, 0.01 );
+        end
 	end
 	
 	function SW_LightOrDark(allegiance)
@@ -2045,6 +2263,8 @@ if CLIENT then
 		surface.SetMaterial( Material( path, "noclamp" ) )
 		surface.DrawTexturedRectUV( x, y, w, h, 0, 0, 1, 1)
 	end
+    
+
 
 	
 	function ENT:GetFPV()

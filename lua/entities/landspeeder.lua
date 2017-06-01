@@ -118,8 +118,9 @@ if CLIENT then
 		end
 		
 	end
-
-		local View = {}
+    
+	ENT.HasCustomCalcView = true;	
+    local View = {}
 	function CalcView()
 		
 		local p = LocalPlayer();

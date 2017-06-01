@@ -94,7 +94,7 @@ if CLIENT then
 	ENT.Sounds={
 		Engine=Sound("landspeeder_fly.wav"),
 	}
-	
+	ENT.HasCustomCalcView = true;
 	local Health = 0;
 	function ENT:Think()
 		self.BaseClass.Think(self);
