@@ -588,25 +588,29 @@ end
 hook.Add("PlayerEnteredVehicle","SWVehicleSeatEnter", function(p,v)
 	if(IsValid(v) and IsValid(p)) then
         local e = v:GetParent();
-		if(v["Is" .. e.Vehicle .. "Seat"]) then
-			p:SetNetworkedEntity(e.Vehicle .. "Seat",v);
-			p:SetNetworkedEntity(e.Vehicle,v:GetParent());
-			p:SetNetworkedBool(e.Vehicle .. "Passenger",true);
+        if(e.IsSWVehicle) then
+            if(v["Is" .. e.Vehicle .. "Seat"]) then
+                p:SetNetworkedEntity(e.Vehicle .. "Seat",v);
+                p:SetNetworkedEntity(e.Vehicle,v:GetParent());
+                p:SetNetworkedBool(e.Vehicle .. "Passenger",true);
+            end
 		end
 	end
 end);
     
 hook.Add("PlayerLeaveVehicle", "SWVehicleSeatExit", function(p,v)
 	if(IsValid(p) and IsValid(v)) then
-        v:SetThirdPersonMode(false);
         local e = v:GetParent();
-		if(v["Is" .. e.Vehicle .. "Seat"]) then
-			p:SetNetworkedEntity(e.Vehicle .. "Seat",NULL);
-			p:SetNetworkedEntity(e.Vehicle,NULL);
-			p:SetNetworkedBool(e.Vehicle .. "Passenger",false);
-            local pos = e:LocalToWorld(v._ExitPos or Vector(0,0,0));
-			p:SetPos(pos);
-		end
+        if(e.IsSWVehicle) then
+            v:SetThirdPersonMode(false);
+            if(v["Is" .. e.Vehicle .. "Seat"]) then
+                p:SetNetworkedEntity(e.Vehicle .. "Seat",NULL);
+                p:SetNetworkedEntity(e.Vehicle,NULL);
+                p:SetNetworkedBool(e.Vehicle .. "Passenger",false);
+                local pos = e:LocalToWorld(v._ExitPos or Vector(0,0,0));
+                p:SetPos(pos);
+            end
+        end
 	end
 end);
 
@@ -733,8 +737,8 @@ function ENT:Think()
                     if(self.Pilot:KeyDown(IN_SPEED)  and self.Pilot:KeyDown(IN_JUMP) and self.NextUse.LightSpeed < CurTime()) then
                         if(!self.LightSpeed and !self.HyperdriveDisabled) then
                             self.LightSpeed = true;
-                            self.LightSpeedTimer = CurTime() + 3;
-                            self.NextUse.LightSpeed = CurTime() + 20;
+                            self.LightSpeedTimer = CurTime() + (self.LightSpeedChargeTime or 3);
+                            self.NextUse.LightSpeed = CurTime() + (self.LightspeedDelay or 20);
 
                         end
                     end
