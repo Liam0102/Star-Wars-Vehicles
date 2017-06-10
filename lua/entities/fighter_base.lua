@@ -146,11 +146,7 @@ function ENT:Initialize()
     
 	self.WarpDestination = Vector(0,0,0);
     if(self.HasLightspeed) then
-        if(WireLib) then
-            Wire_CreateInputs(self, { "Destination [VECTOR]", })
-        else
-            self.DistanceMode = true;
-        end
+        self:InitLightspeed();
     end
 	
 	if(not self.Bullet) then
@@ -219,6 +215,14 @@ function ENT:Initialize()
 	end
         
 
+end
+    
+function ENT:InitLightspeed()
+    if(WireLib) then
+        Wire_CreateInputs(self, { "Destination [VECTOR]", })
+    else
+        self.DistanceMode = true;
+    end     
 end
 
 function ENT:ConfigVars()
@@ -1221,7 +1225,7 @@ function ENT:PhysicsSimulate( phys, deltatime )
                 ang.Roll = (ang.Roll + self.Roll - ExtraRoll*mul) % 360;
                 if (ang.Roll!=ang.Roll) then ang.Roll = oldRoll; end -- fix for nan values that cause despawing/crash.
 
-                if(self.Pilot:KeyDown(IN_JUMP) and self.Pilot:KeyDown(IN_DUCK)) then
+                if(self.Pilot:KeyDown(IN_JUMP) and self.Pilot:KeyDown(IN_DUCK) and !self.PreventLand) then
                     local tr = util.TraceLine({
                         start = self.LandTracePos or self:GetPos(),
                         endpos = self:GetPos()+self:GetUp()*-(self.LandDistance or 300),
@@ -1852,7 +1856,6 @@ if CLIENT then
 				end
 			end
 		end
-		
 	end)
 	
 	function SW_WeaponReticles(self)
