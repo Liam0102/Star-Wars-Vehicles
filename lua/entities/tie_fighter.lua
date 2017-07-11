@@ -102,16 +102,8 @@ if CLIENT then
 		//Engine=Sound("ambient/atmosphere/ambience_base.wav"),
 		Engine=Sound("vehicles/tie/tie_fly3.wav"),
 	}
+    
 	ENT.CanFPV = true;
-	
-	hook.Add("ScoreboardShow","TIEFighterScoreDisable", function()
-		local p = LocalPlayer();	
-		local Flying = p:GetNWBool("FlyingTie");
-		if(Flying) then
-			return false;
-		end
-	end)
-
 	ENT.ViewDistance = 700;
     ENT.ViewHeight = 300;
     ENT.FPVPos = Vector(30.6,15,180);

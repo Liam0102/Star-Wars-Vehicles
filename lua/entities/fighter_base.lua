@@ -4,6 +4,7 @@ ENT.Type = "vehicle"
 ENT.AutomaticFrameAdvance = true;
 
 ENT.IsSWVehicle = true;
+ENT._IsFlyingVehicle = true;
 
 if SERVER then
     
@@ -116,7 +117,8 @@ ENT.DeactivateInWater = true;
 AddCSLuaFile();
 
 function ENT:Initialize()
-
+        
+        
 	self:SetModel(self.EntModel);
 	self:PhysicsInit(SOLID_VPHYSICS);
 	self:SetMoveType(MOVETYPE_VPHYSICS);
@@ -124,7 +126,6 @@ function ENT:Initialize()
 	self:StartMotionController();
 	self:SetUseType(SIMPLE_USE);
 	self:SetRenderMode(RENDERMODE_TRANSALPHA);
-	self.Hover = true;
 	self.PlayerActiveWeapon = "";
 	if(!self.Weapons) then
 		self:SpawnWeapons();
@@ -191,7 +192,7 @@ function ENT:Initialize()
 	self:SetNWInt("Health",self.StartHealth);
 	self:SetNWInt("StartHealth",self.StartHealth);
 	local mb, mb2 = self:GetModelBounds();
-	self.Mass = ((mb2.x + mb2.y + mb2.z) - (mb.x + mb.y + mb.z))*10;
+	self.Mass = (mb - mb2):Length()*10;
 	self.ShipLength = (mb2.x - mb.x)/2;
 	local phys = self:GetPhysicsObject();
         
@@ -201,7 +202,13 @@ function ENT:Initialize()
 		phys:Wake()
 		phys:SetMass(self.Mass or 10000)
 	end
-	
+      /* 
+    if(self.HasLookaround) then
+        self:SetNWBool("HasLookaround",true);
+    else
+        self:SetNWBool("HasLookaround",false);
+	end*/
+        
 	self:SW_LoadConfig();
 	self:ConfigVars();
         
@@ -213,7 +220,6 @@ function ENT:Initialize()
 		self.ShouldLock = false;
 		self:SetNWBool("ShouldLock",false);
 	end
-        
 
 end
     
@@ -223,6 +229,36 @@ function ENT:InitLightspeed()
     else
         self.DistanceMode = true;
     end     
+end
+
+hook.Add("PlayerSpawnedSENT","ServerSpawnedSENT",function(p,e)
+    if(e.IsSWVehicle and e._IsFlyingVehicle) then
+        e.VehicleOwner = p;  
+        e.TransponderCode = e:GenerateTransponder();
+        e:SetNWString("TransponderCode", e.TransponderCode);
+    end
+end);
+
+function ENT:GenerateTransponder()
+
+    local steamid = self.VehicleOwner:SteamID();
+    if(steamid == "STEAM_ID_PENDING") then
+       steamid = "STEAM_0:0:00000"     
+    end
+    local code = string.upper(string.sub(string.gsub(string.gsub(self.PrintName," ",""),"-",""),0,3));
+    steamid = string.sub(string.Split(steamid,":")[3],1,4);
+    return code .. " " .. steamid .. self:CountPlayerOwnedSENTs(self:GetClass(),self.VehicleOwner);
+        
+end
+    
+function ENT:CountPlayerOwnedSENTs(class,p)
+    local count = 0;
+    for k,v in pairs(ents.FindByClass(class)) do
+        if(v.VehicleOwner == p) then
+            count = count + 1;
+        end
+    end
+    return count;
 end
 
 function ENT:ConfigVars()
@@ -298,7 +334,7 @@ end
 
 function ENT:Enter(p)
 
-	if(not self.Inflight) then
+	if(!self.Inflight and !self.Done) then
 		p:SetNetworkedEntity(self.Vehicle,self); --Set a networked entity as the name of the vehicle
 		p:SetNetworkedBool("Flying"..self.Vehicle,true); --Set a bool on the player
 		p:Spectate(OBS_MODE_CHASE); --Spectate the vehicle
@@ -332,6 +368,7 @@ function ENT:Enter(p)
 		end
 		self:SetNWBool("Flying" .. self.Vehicle,true);
 		self:SetNWInt("SW_MaxSpeed",self:GetTopSpeed());
+        self:SetNWBool("HasLookaround", self.HasLookaround != nil and self.HasLookaround != false)
 		p:SetViewEntity(self)
 		self:GetPhysicsObject():Wake();
 		self:GetPhysicsObject():EnableMotion(true); --UnFreeze us
@@ -1239,6 +1276,7 @@ function ENT:PhysicsSimulate( phys, deltatime )
                         if(IsValid(self.Pilot)) then
                             self.Pilot:SetNWBool("SW_Land",self.Land);
                         end
+                        self:ResetThrottle();
                     end
                 end
 
@@ -1506,17 +1544,7 @@ end
 if CLIENT then
 
 	function ENT:Draw() 
-		self:DrawModel() 
-		local avatar = self:GetNWEntity("PilotAvatar");
-		if(IsValid(avatar)) then
-			local p = LocalPlayer();
-			local Flying = p:GetNWBool("Flying"..self.Vehicle);
-			if(Flying and (SW_GetFPV() or self:GetFPV())) then
-				avatar:SetNoDraw(true);
-			else
-				avatar:DrawModel();
-			end
-		end
+		self:DrawModel()
 	end
 	
 	local ShipName = "";
@@ -1529,8 +1557,9 @@ if CLIENT then
 			self.EngineSound = self.EngineSound or CreateSound(self.Entity,self.Sounds.Engine);
 		end
 		FPV = false;
+        self.HasLookaround = self:GetNWBool("HasLookaround");
 		surface.CreateFont( "HUD_Health", {
-			font = "Aurebesh",
+			font = "Arial",
 			size = ScrH()/60,
 			weight = 1000,
 			blursize = 0,
@@ -1550,6 +1579,23 @@ if CLIENT then
 		surface.CreateFont( "HUD_Altimeter", {
 			font = "Arial",
 			size = ScrH()/60,
+			weight = 1000,
+			blursize = 0,
+			scanlines = 0,
+			antialias = false,
+			underline = false,
+			italic = false,
+			strikeout = false,
+			symbol = false,
+			rotary = false,
+			shadow = true,
+			additive = false,
+			outline = false,
+		} )
+        
+		surface.CreateFont( "HUD_Transponder", {
+			font = "Arial",
+			size = ScrH()/65,
 			weight = 1000,
 			blursize = 0,
 			scanlines = 0,
@@ -1594,10 +1640,15 @@ if CLIENT then
 
 		
 		local IsDriver = p:GetNWEntity(self.Vehicle) == self.Entity;
-		if(IsFlying) then
+		if(Flying) then
 			local avatar = self:GetNWEntity("PilotAvatar");
-			if(IsValid(avatar)) then
-				self:Draw();
+			if(IsValid(avatar))  then
+			if(IsFlying and (SW_GetFPV() or self:GetFPV())) then
+				avatar:SetNoDraw(true);
+			else
+				avatar:DrawModel();
+                avatar:SetNoDraw(false);
+			end
 				local count = table.Count(self.Filter);
 				if(!IsValid(self.Filter[count+1])) then
 					self.Filter[count+1] = avatar;
@@ -1612,7 +1663,7 @@ if CLIENT then
 			local doppler = 0;
 			-- For the Doppler-Effect!
 			if(not IsDriver) then
-				-- Does the vehicle fly to the player or away from him?
+				-- Is the vehicle flying towards the player or away from him?
 				local dir = (p:GetPos() - self.Entity:GetPos());
 				doppler = velo:Dot(dir)/(150*dir:Length());
 			end
@@ -1765,7 +1816,7 @@ if CLIENT then
 		end
 		FPV = false;
 		if(IsValid(self.FXEmitter)) then
-			self.FXEmitter:Remove();
+			self.FXEmitter:Finish();
 		end
 	end
 	
@@ -1842,7 +1893,7 @@ if CLIENT then
             self = p:GetViewEntity();
 			if(IsValid(self) and !self.HasCustomCalcView) then				
 				local pos = self:LocalToWorld(self.FPVPos or Vector(0,0,0));
-				View = SWVehicleView(self,self.ViewDistance or 800,self.ViewHeight or 250,pos,true)
+				View = SWVehicleView(self,self.ViewDistance or 800,self.ViewHeight or 250,pos,self:GetNWBool("HasLookaround"))
 				return View;
 			end
 		elseif(IsPassenger) then
@@ -1857,10 +1908,17 @@ if CLIENT then
 			end
 		end
 	end)
+    
+    hook.Add("ScoreboardShow","SWVehicleLookaroundScoreDisable", function()
+		local p = LocalPlayer();	
+		local Piloting = p:GetViewEntity() != p and p:GetViewEntity().IsSWVehicle;
+		if(Piloting and p:GetViewEntity():GetNWBool("HasLookaround")) then
+			return false;
+		end
+	end);
 	
 	function SW_WeaponReticles(self)
-
-		
+	
 		local tr = util.TraceLine( {
 			start = self:GetPos(),
 			endpos = self:GetPos() + self:GetForward()*10000,
@@ -1996,8 +2054,8 @@ if CLIENT then
 		
 
 		surface.SetTextColor(Color(255,255,255,255));
-		x = x + w * 0.26;
-		y = y - tH / 2 + h * 0.05
+		x = x + w * 0.35 - tW/2;
+		y = y - tH / 2 + h * 0.06
 		
 		surface.SetTextPos(x,y + tH/2);
 		surface.DrawText(health)
@@ -2216,8 +2274,20 @@ if CLIENT then
 				surface.DrawTexturedRectUV( x, y, w, h, 0, 0, 1, 1 )				
 			end
 		end
-			
-
+        
+        //Transponder Code
+        local Transponder = self:GetNWString("TransponderCode");
+        surface.SetMaterial( Material( "hud/clearance_code.png", "noclamp" ) )
+        w = size;
+        h = size / 3.08;
+        x = ScrW() - w/2 - size * 0.65;
+        y = ScrW() / 100;
+        surface.SetFont("HUD_Transponder")
+        surface.SetDrawColor(255,255,255,255)
+        surface.DrawTexturedRectUV( x, y, w, h, 0, 0, 1, 1 )	
+        surface.SetTextPos(x+w*0.32,y+h*0.45);
+        surface.DrawText(Transponder);
+        
         if(self.Lightspeed == 2) then
             DrawMotionBlur( 0.4, 20, 0.01 );
         end

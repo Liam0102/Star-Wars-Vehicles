@@ -9,6 +9,7 @@ ENT.AutomaticFrameAdvance = true
 ENT.Spawnable = false;
 ENT.AdminSpawnable = false;
 ENT.IsSWVehicle = true;
+ENT._IsSpeederVehicle = true;
 
 local classes = {
 	"speeder_bike",

@@ -53,7 +53,7 @@ function ENT:Initialize()
 	self.CurrentDroid = self.DroidModels[math.random(1,3)];
 	self:SpawnDroid(self:GetPos()+self:GetUp()*32.5+self:GetRight()*-50+self:GetForward()*-8)
 	
-	self.Bullet = CreateBulletStructure(100,"red");
+	self.Bullet = CreateBulletStructure(100,"green");
 
 	self.BaseClass.Initialize(self)
 end

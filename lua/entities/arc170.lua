@@ -46,7 +46,7 @@ function ENT:Initialize()
 	self.UpSpeed = 500; //This is how fast you can go up or down while holding SPACE or CTRL
 	self.AccelSpeed = 8; //This is how fast you reach the speeds. The higher the number the quicker it is.
 	
-	self.Bullet = CreateBulletStructure(90,"red");
+	self.Bullet = CreateBulletStructure(90,"blue");
 	self.CanShoot = true;
 	self.FireDelay = 0.3 // This is how fast you can fire. The smaller, the faster.
 	self.AlternateFire = true;

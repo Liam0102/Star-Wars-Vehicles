@@ -51,7 +51,6 @@ function SWV_Spawn_SENT( player, EntityName, tr )
 			entity:SetPos( SpawnPos )
 		entity:Spawn()
 		entity:Activate()
-
 		if ( EntTable.DropToFloor ) then
 			entity:DropToFloor()
 		end
@@ -97,9 +96,6 @@ function SWV_CCGiveSWEP( player, command, arguments )
 	end
 
 	if (swep == nil) then return end
-
-	-- You're not allowed to spawn this!
-	if (StarGate.NotSpawnable(arguments[1],player,"swep")) then return end
 
 	if ( !gamemode.Call( "PlayerGiveSWEP", player, arguments[1], swep ) ) then return end
 

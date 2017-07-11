@@ -50,7 +50,7 @@ function ENT:Initialize()
 	self.Cooldown = 2;
 	self.HasLookaround = true;
 	self.CanShoot = true;
-	self.Bullet = CreateBulletStructure(75,"red");
+	self.Bullet = CreateBulletStructure(75,"green");
 	self.FireDelay = 0.15;
 	self.AlternateFire = true;
 	self.FireGroup = {"Left","Right",};
@@ -163,14 +163,6 @@ if CLIENT then
 	ENT.Sounds={
 		Engine=Sound("ambient/atmosphere/ambience_base.wav"),
 	}
-	
-	hook.Add("ScoreboardShow","N1v2ScoreDisable", function()
-		local p = LocalPlayer();	
-		local Flying = p:GetNWBool("N1v2");
-		if(Flying) then
-			return false;
-		end
-	end)
 	
 	function ENT:Initialize()
 		self.Emitter = ParticleEmitter(self:GetPos());

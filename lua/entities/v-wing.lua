@@ -51,7 +51,7 @@ function ENT:Initialize()
 	self.Cooldown = 2;
 	self.HasWings = true;
 	self.CanShoot = true;
-	self.Bullet = CreateBulletStructure(75,"red");
+	self.Bullet = CreateBulletStructure(75,"green");
 	self.FireDelay = 0.15;
 	self.AlternateFire = true;
 	self.FireGroup = {"Left","Right",};

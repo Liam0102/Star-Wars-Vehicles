@@ -66,7 +66,7 @@ function ENT:Initialize()
 		self:GetPos()+self:GetForward()*-100+self:GetUp()*10+self:GetRight()*-10,
 		self:GetPos()+self:GetForward()*-100+self:GetUp()*10+self:GetRight()*10,
 	}
-	self.Bullet = CreateBulletStructure(50,"red");
+	self.Bullet = CreateBulletStructure(50,"blue");
 	self.WeaponDir = self:GetAngles():Forward()*-1;
 	self:SpawnWeapons();
 	self.StandbyHoverAmount = 40;

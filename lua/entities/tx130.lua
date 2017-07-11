@@ -60,7 +60,7 @@ function ENT:Initialize()
 	self:SpawnTurret();
 	self:SpawnCannons();
 	
-	self.Bullet = CreateBulletStructure(150,"red");
+	self.Bullet = CreateBulletStructure(150,"blue");
 	
 end
 

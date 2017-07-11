@@ -151,13 +151,6 @@ if CLIENT then
 		self.BaseClass.Initialize(self);
 	end
 	
-	hook.Add("ScoreboardShow","BWingScoreDisable", function()
-		local p = LocalPlayer();	
-		local Flying = p:GetNWBool("FlyingBWing");
-		if(Flying) then
-			return false;
-		end
-	end)
     ENT.HasCustomCalcView = true;
 	local View = {}
 	local function CalcView()
