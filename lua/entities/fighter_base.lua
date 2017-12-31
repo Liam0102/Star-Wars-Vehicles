@@ -215,6 +215,10 @@ function ENT:Initialize()
     if(self.HasSeats) then
         self:SpawnSeats();
     end
+        
+    if(!self.PilotOffset) then
+       self.PilotOffset = Vector(0,0,0);     
+    end
 	
 	if(!Should_LockOn) then
 		self.ShouldLock = false;
@@ -442,7 +446,7 @@ function ENT:GetTopSpeed()
 end
 
 function ENT:Exit(kill) --####### Get out @RononDex
-
+    self.Inflight = false;
 	if (IsValid(self.Pilot)) then
 		self.Pilot:UnSpectate();
 		self.Pilot:DrawViewModel(true);
@@ -452,7 +456,7 @@ function ENT:Exit(kill) --####### Get out @RononDex
 		self.Pilot:SetNWBool("Flying"..self.Vehicle,false);
 		
 		if(self.ExitModifier) then
-			self.ExitPos = self:GetPos() + (self:GetRight() * self.ExitModifier.x) + (self:GetForward() * self.ExitModifier.y + self:GetUp()* self.ExitModifier.z);
+			self.ExitPos = self:GetPos() + (self:GetRight() * self.ExitModifier.x) + (self:GetForward() * self.ExitModifier.y) + (self:GetUp()* self.ExitModifier.z);
         else
             self.ExitPos = self:GetPos()+self:GetUp()*105+self:GetRight()*100+self:GetForward()*-80;
 		end
@@ -489,7 +493,6 @@ function ENT:Exit(kill) --####### Get out @RononDex
 	end
 	self:ResetThrottle();
 	self:Rotorwash(false);
-	self.Inflight = false;
 	self:SetNWEntity(self.Vehicle,nil);
 	self:SetNWBool("Flying" .. self.Vehicle,false);
 	
@@ -733,13 +736,7 @@ function ENT:Think()
                 self.Pilot:LsResetSuit()
             end
         end
-        if(IsValid(self.Pilot)) then
-            if(self.PilotOffset) then
-                self.Pilot:SetPos(self:GetPos()+self:GetRight()*self.PilotOffset.x+self:GetForward()*self.PilotOffset.y+self:GetUp()*self.PilotOffset.z);
-            else
-                self.Pilot:SetPos(self:GetPos());
-            end
-        end
+
 	
 		if(IsValid(self.Pilot) and !self.Pilot:Alive()) then
 			self:Bang();
@@ -866,6 +863,10 @@ function ENT:Think()
 			
 
 		end
+            
+        if(IsValid(self.Pilot) and self.Inflight and !self.Pilot:KeyDown(IN_USE)) then
+            self.Pilot:SetPos(self:GetPos()+(self:GetRight()*self.PilotOffset.x)+(self:GetForward()*self.PilotOffset.y)+(self:GetUp()*self.PilotOffset.z));
+        end
 		
         if(!self.DeactivateInWater) then
             if(self:WaterLevel() >= 1) then
@@ -1908,6 +1909,18 @@ if CLIENT then
 			end
 		end
 	end)
+    
+    hook.Add( "ShouldDrawLocalPlayer", "SWVehiclesDrawPlayerModel", function( p )
+		local IsPassenger  = IsValid(p:GetVehicle()) and IsValid(p:GetVehicle():GetParent()) and p:GetVehicle():GetParent().IsSWVehicle;
+		if(IsPassenger) then
+            local seat = p:GetVehicle();
+			if(IsValid(seat)) then
+				if(seat:GetThirdPersonMode()) then
+					return true;
+				end
+			end
+		end
+	end);
     
     hook.Add("ScoreboardShow","SWVehicleLookaroundScoreDisable", function()
 		local p = LocalPlayer();	

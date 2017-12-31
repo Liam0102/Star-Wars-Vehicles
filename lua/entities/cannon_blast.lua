@@ -41,21 +41,27 @@ if SERVER then
 		phys:SetVelocity(ang*(2000*vel))
 	end
 	
-	function ENT:PhysicsCollide(data, physobj)
-	
-		for i=1,math.Round(self.Damage/100) do
-			local pos = self:GetPos()+self:GetForward()*math.random(-self.Damage/2,self.Damage/2)+self:GetRight()*math.random(-self.Damage/2,self.Damage/2)
-			local fx = EffectData()
-				fx:SetOrigin(pos);
-			util.Effect("Explosion",fx,true,true);
-		end
-		for k,v in pairs(ents.FindInSphere(self:GetPos(),self.Damage)) do
-			local dist = (self:GetPos() - v:GetPos()):Length();
-			local dmg = math.Clamp((self.Damage or 600) - dist,0,(self.Damage or 600));
-			v:TakeDamage(dmg);
-		end
-		self:Remove()
-	end
+    function ENT:PhysicsCollide(data, physobj)
+        for i = 1, math.Round(self.Damage / 100) do
+            local pos = self:GetPos() + self:GetForward() * math.random(-self.Damage / 2, self.Damage / 2) + self:GetRight() * math.random(-self.Damage / 2, self.Damage / 2)
+            local fx = EffectData()
+            fx:SetOrigin(pos)
+            util.Effect("Explosion", fx, true, true)
+        end
+
+        for k, v in pairs(ents.FindInSphere(self:GetPos(), self.Damage)) do
+            local dist = (self:GetPos() - v:GetPos()):Length()
+            local dmg = math.Clamp((self.Damage or 600) - dist, 0, (self.Damage or 600))
+            v:TakeDamage(dmg)
+        end
+
+        timer.Simple(0, function()
+            if (IsValid(self)) then
+                self:Remove()
+            end
+        end)
+        --Remove the next frame..
+    end
 	
 end
 

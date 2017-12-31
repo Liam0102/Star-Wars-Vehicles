@@ -106,5 +106,15 @@ function EFFECT:Render()
 
 	render.SetMaterial( MaterialMain );
 	render.DrawBeam( startPos, endPos, 30, 0, 1, color_white );
-	
+
+    local dynlight = DynamicLight(self:EntIndex() * 4096);
+    dynlight.Pos = startPos;
+    dynlight.Brightness = 5;
+    dynlight.Size = 100;
+    dynlight.Decay = 1024;
+    dynlight.R = 255;
+    dynlight.G = 50;
+    dynlight.B = 50;
+    dynlight.DieTime = CurTime()+1;
+
 end

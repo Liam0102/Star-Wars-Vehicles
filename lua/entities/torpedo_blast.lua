@@ -35,17 +35,6 @@ if SERVER then
 		phys:EnableGravity(false);
 		phys:Wake()
 	end
-
-    /*
-	hook.Add("ShouldCollide","SW_TorpedoCollision", function(e1,e2)
-		if((e1.IsTorpedo and e2.IsSWVehicle) or (e1.IsSWVehicle and e2.IsTorpedo)) then
-			if(e1.IsTorpedo and e2 == e1.Shooter or e2.IsTorpedo and e1 == e2.Shooter) then
-				return false;
-			end	
-		end
-        return true;
-	end);
-	*/
     
 	function ENT:PrepareTorpedo(e,s,vel)
 		self.Shooter = e;
@@ -99,7 +88,7 @@ if SERVER then
 		local pos = self:GetPos();
 		local fx = EffectData()
 			fx:SetOrigin(pos);
-		util.Effect("HelicopterMegaBomb",fx,true,true);
+		util.Effect("Explosion",fx,true,true);
 
 		local e = data.HitEntity;
 		if(IsValid(e) and e.IsSWVehicle) then
