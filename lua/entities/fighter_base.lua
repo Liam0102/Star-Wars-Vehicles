@@ -1644,12 +1644,12 @@ if CLIENT then
 		if(Flying) then
 			local avatar = self:GetNWEntity("PilotAvatar");
 			if(IsValid(avatar))  then
-			if(IsFlying and (SW_GetFPV() or self:GetFPV())) then
-				avatar:SetNoDraw(true);
-			else
-				avatar:DrawModel();
-                avatar:SetNoDraw(false);
-			end
+                if(IsFlying and (SW_GetFPV() or self:GetFPV()) and IsDriver) then
+                    avatar:SetNoDraw(true);
+                else
+                    avatar:DrawModel();
+                    avatar:SetNoDraw(false);
+                end
 				local count = table.Count(self.Filter);
 				if(!IsValid(self.Filter[count+1])) then
 					self.Filter[count+1] = avatar;
