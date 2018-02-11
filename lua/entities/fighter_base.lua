@@ -439,10 +439,10 @@ function ENT:SpawnPilot(pos)
 end
 
 function ENT:GetTopSpeed()
-	if(self.ForwardSpeed > self.BoostSpeed) then
-		return self.ForwardSpeed;
+	if(self.OGForward > self.OGBoost) then
+		return self.OGForward;
 	end
-	return self.BoostSpeed;
+	return self.OGBoost;
 end
 
 function ENT:Exit(kill) --####### Get out @RononDex
@@ -734,6 +734,17 @@ function ENT:Think()
         if CAF and CAF.GetAddon("Spacebuild") then
             if(IsValid(self.Pilot) and self.Pilot.LsResetSuit) then
                 self.Pilot:LsResetSuit()
+            end
+        end
+        
+        
+        self.ForwardSpeed = self.OGForward;
+        self.BoostSpeed = self.OGBoost;
+        for k,v in pairs(ents.FindInSphere(self:GetPos(),1500)) do
+            if(v:GetName() == "ship_speed") then
+                local n = self:GetTopSpeed() * 0.2;
+                self.ForwardSpeed = math.Clamp(n,0,self.OGForward);
+                self.BoostSpeed = math.Clamp(n,0,self.OGBoost);
             end
         end
 
