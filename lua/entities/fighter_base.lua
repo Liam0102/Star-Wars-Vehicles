@@ -1278,7 +1278,7 @@ function ENT:PhysicsSimulate( phys, deltatime )
                     local tr = util.TraceLine({
                         start = self.LandTracePos or self:GetPos(),
                         endpos = self:GetPos()+self:GetUp()*-(self.LandDistance or 300),
-                        filter = {self:GetChildEntities()},
+                        filter = self:GetChildEntities(),
                     })
 
                     if(tr.HitWorld or (IsValid(tr.Entity) and tr.Entity:GetClass() == "prop_physics")) then
@@ -1311,7 +1311,7 @@ function ENT:PhysicsSimulate( phys, deltatime )
                     local heightTrace = util.TraceLine({
                         start = self:GetPos(),
                         endpos = self:GetPos()+Vector(0,0,-100),
-                        filter = {self:GetChildEntities()},
+                        filter = self:GetChildEntities(),
                     })
                     if(heightTrace.Hit) then
                         local nextPos = self:GetPos()+(FWD*self.Accel.FWD)+(UP*self.Accel.UP)+(RIGHT*self.Accel.RIGHT);
@@ -1324,7 +1324,7 @@ function ENT:PhysicsSimulate( phys, deltatime )
                     local forwardTrace = util.TraceLine({
                         start = self:GetPos(),
                         endpos = self:GetPos()+self:GetForward()*(self.ShipLength+100),
-                        filter = {self:GetChildEntities()},
+                        filter = self:GetChildEntities(),
                     })
 
                     if(forwardTrace.Hit) then
