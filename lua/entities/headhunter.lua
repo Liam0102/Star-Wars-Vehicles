@@ -4,7 +4,7 @@ ENT.Type = "vehicle"
 
 ENT.PrintName = "Z-95 Headhunter"
 ENT.Author = "Liam0102"
-ENT.Category = "Star Wars Vehicles: Republic"
+ENT.Category = "Star Wars Vehicles: Rebels"
 ENT.AutomaticFrameAdvance = true
 ENT.Spawnable = false;
 ENT.AdminSpawnable = false;
